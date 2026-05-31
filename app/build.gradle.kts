@@ -29,17 +29,24 @@ android {
     }
 
     signingConfigs {
-        getByName("debug") {
-            storeFile = file("../keys/platform.p12")
-            storePassword = "android"
-            keyAlias = "android"
-            keyPassword = "android"
-        }
-        create("release") {
-            storeFile = file("../keys/platform.p12")
-            storePassword = "android"
-            keyAlias = "android"
-            keyPassword = "android"
+        val keystoreFile = file("../keys/platform.p12")
+        if (keystoreFile.exists()) {
+            getByName("debug") {
+                storeFile = keystoreFile
+                storePassword = "android"
+                keyAlias = "android"
+                keyPassword = "android"
+            }
+            create("release") {
+                storeFile = keystoreFile
+                storePassword = "android"
+                keyAlias = "android"
+                keyPassword = "android"
+            }
+        } else {
+            create("release") {
+                // Fallback to default debug keystore if platform key is missing
+            }
         }
     }
 
