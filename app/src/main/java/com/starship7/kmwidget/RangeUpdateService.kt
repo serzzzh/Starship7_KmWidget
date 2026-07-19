@@ -50,7 +50,7 @@ class RangeUpdateService : Service() {
         if (odometer > 0) {
             Log.i(TAG, "Collected: ODO=$odometer, BAT=$battery, FUEL=$fuel")
             dbHelper.insertLog(System.currentTimeMillis(), odometer, battery, fuel)
-            RangeWidgetProvider.updateAllWidgets(this, dbHelper, vehicleHelper)
+            RangeWidgetProvider.updateAllWidgets(this)
         }
     }
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Range Widget</string>
+    <string name="widget_activity_title">Range Widget</string>
+    <string name="widget_status_loading">Проверка статуса виджета…</string>
+    <string name="widget_status_none">Виджет на рабочем столе ещё не добавлен.</string>
+    <string name="widget_status_count">Виджетов на рабочем столе: %1$d</string>
+    <string name="widget_preview_title">Текущий расчёт</string>
+    <string name="widget_config_title">Настройки расчёта</string>
+    <string name="widget_config_time">Последние N минут</string>
+    <string name="widget_config_km">Последние X км</string>
+    <string name="widget_config_hint">Введите значение (N или X)</string>
+    <string name="widget_add_to_home">Добавить виджет на рабочий стол</string>
+    <string name="widget_refresh">Обновить данные</string>
+    <string name="widget_flyme_hint">На Flyme Auto: откройте редактор рабочего стола или Scene Director → Добавить виджет → Range Widget.</string>
+    <string name="widget_bind_failed">Не удалось добавить виджет. Откройте редактор рабочего стола и выберите Range Widget из списка.</string>
+    <string name="widget_shortcut_name">Range Widget</string>
+</resources>
