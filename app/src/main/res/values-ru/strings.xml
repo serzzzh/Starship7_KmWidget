@@ -10,9 +10,10 @@
     <string name="widget_config_time">Последние N минут</string>
     <string name="widget_config_km">Последние X км</string>
     <string name="widget_config_hint">Введите значение (N или X)</string>
-    <string name="widget_add_to_home">Добавить виджет на рабочий стол</string>
+    <string name="widget_add_to_home">Открыть галерею виджетов</string>
     <string name="widget_refresh">Обновить данные</string>
-    <string name="widget_flyme_hint">На Flyme Auto: откройте редактор рабочего стола или Scene Director → Добавить виджет → Range Widget.</string>
-    <string name="widget_bind_failed">Не удалось добавить виджет. Откройте редактор рабочего стола и выберите Range Widget из списка.</string>
+    <string name="widget_flyme_hint">После открытия галереи выберите Range Widget и перетащите на рабочий стол.</string>
+    <string name="widget_bind_failed">Не удалось открыть галерею виджетов. Используйте редактор рабочего стола и выберите Range Widget.</string>
+    <string name="widget_picker_opened">Галерея виджетов открыта. Выберите Range Widget и добавьте на рабочий стол.</string>
     <string name="widget_shortcut_name">Range Widget</string>
 </resources>

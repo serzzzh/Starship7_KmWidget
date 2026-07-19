@@ -10,9 +10,10 @@
     <string name="widget_config_time">Last N minutes</string>
     <string name="widget_config_km">Last X km</string>
     <string name="widget_config_hint">Enter value (N or X)</string>
-    <string name="widget_add_to_home">Add widget to home screen</string>
+    <string name="widget_add_to_home">Open widget gallery</string>
     <string name="widget_refresh">Refresh data</string>
-    <string name="widget_flyme_hint">On Flyme Auto: open home screen editor or Scene Director, choose Add widget, then select Range Widget.</string>
-    <string name="widget_bind_failed">Could not add widget. Open home screen editor and select Range Widget from the list.</string>
+    <string name="widget_flyme_hint">After opening the gallery, select Range Widget and drag it to the home screen.</string>
+    <string name="widget_bind_failed">Could not open widget gallery. Use the home screen editor and select Range Widget.</string>
+    <string name="widget_picker_opened">Widget gallery opened. Select Range Widget and add it to the home screen.</string>
     <string name="widget_shortcut_name">Range Widget</string>
 </resources>
