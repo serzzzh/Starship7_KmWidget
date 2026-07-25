@@ -28,3 +28,7 @@
 ## Архитектура
 См. файл [TECH_SPEC.md](TECH_SPEC.md) для подробного описания логики расчетов и компонентов.
 Документация по Car API и свойствам находится в [car_api.md](car_api.md).
+
+## Выводы и ограничения
+Важные выводы по Flyme Auto, Car API threading, overlay и установке —
+см. [LESSONS_LEARNED.md](LESSONS_LEARNED.md).
