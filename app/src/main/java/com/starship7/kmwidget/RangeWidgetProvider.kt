@@ -29,6 +29,20 @@ class RangeWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
+
+        /** Called from RangeUpdateService — reuses existing vehicleHelper (already on main thread) */
+        fun updateAppWidgetFromService(
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetId: Int,
+            dbHelper: RangeDatabaseHelper,
+            vehicleHelper: com.starship7.kmwidget.car.VehiclePropertyHelper
+        ) {
+            val result = RangeCalculator.calculateWithHelper(context, appWidgetId, dbHelper, vehicleHelper)
+            applyViews(context, appWidgetManager, appWidgetId, result)
+        }
+
+        /** Called by the Android widget system (onUpdate) — creates helpers on calling thread */
         fun updateAllWidgets(context: Context) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val componentName = ComponentName(context, RangeWidgetProvider::class.java)
@@ -45,6 +59,15 @@ class RangeWidgetProvider : AppWidgetProvider() {
         ) {
             val result = RangeCalculator.calculate(context, appWidgetId)
 
+            applyViews(context, appWidgetManager, appWidgetId, result)
+        }
+
+        private fun applyViews(
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetId: Int,
+            result: RangeCalculator.RangeResult
+        ) {
             val views = android.widget.RemoteViews(context.packageName, R.layout.widget_range)
             views.setTextViewText(R.id.textRange, result.rangeText)
             views.setTextViewText(R.id.textInfo, result.infoText)

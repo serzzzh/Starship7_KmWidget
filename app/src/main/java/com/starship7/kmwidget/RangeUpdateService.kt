@@ -30,9 +30,11 @@ class RangeUpdateService : Service() {
             .build())
 
         dbHelper = RangeDatabaseHelper(this)
+        // VehiclePropertyHelper MUST be created on main thread (requires Looper for CarPropertyManager)
         vehicleHelper = VehiclePropertyHelper(this)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        // Use Main dispatcher — Car API reads are fast and require main thread Looper
+        CoroutineScope(Dispatchers.Main).launch {
             while (true) {
                 collectData()
                 delay(60000) // Collect every minute
@@ -41,16 +43,32 @@ class RangeUpdateService : Service() {
     }
 
     private fun collectData() {
-        if (!vehicleHelper.isConnected) return
+        if (!vehicleHelper.isConnected) {
+            Log.w(TAG, "Car API not connected, skipping data collection")
+            return
+        }
 
         val odometer = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
         val battery = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
         val fuel = vehicleHelper.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 1).toFloat()
 
+        Log.i(TAG, "Collected: ODO=$odometer, BAT=$battery, FUEL=$fuel")
+
         if (odometer > 0) {
-            Log.i(TAG, "Collected: ODO=$odometer, BAT=$battery, FUEL=$fuel")
             dbHelper.insertLog(System.currentTimeMillis(), odometer, battery, fuel)
-            RangeWidgetProvider.updateAllWidgets(this)
+        }
+        // Update widgets regardless — show current battery/fuel even if no history yet
+        updateWidgetsOnMainThread()
+    }
+
+    private fun updateWidgetsOnMainThread() {
+        val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(this)
+        val componentName = android.content.ComponentName(this, RangeWidgetProvider::class.java)
+        val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
+        if (widgetIds.isEmpty()) return
+
+        for (id in widgetIds) {
+            RangeWidgetProvider.updateAppWidgetFromService(this, appWidgetManager, id, dbHelper, vehicleHelper)
         }
     }
 
