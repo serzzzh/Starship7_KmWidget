@@ -11,6 +11,7 @@ data class CarSnapshot(
     val fuelRangeKm: Float = 0f,
     val batteryPct:  Float = -1f,
     val fuelPct:     Float = -1f,
+    val fuelLiters:  Float = -1f,  // литры (fuelPct * 55 / 100)
     val isConnected: Boolean = false
 )
 
@@ -74,6 +75,7 @@ object RangeCalculator {
             fuelRangeKm = carFuel,
             batteryPct  = currentBat,
             fuelPct     = currentFuel,
+            fuelLiters  = if (currentFuel >= 0) currentFuel / 100f * OverlayLine.FUEL_TANK_LITERS else -1f,
             isConnected = true
         )
 

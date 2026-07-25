@@ -31,15 +31,17 @@ class WidgetActivity : Activity() {
     private lateinit var radioGroup: RadioGroup
     private lateinit var editValue: EditText
     private lateinit var rgRange: RadioGroup
+    private lateinit var btnToggleOverlay: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_widget)
 
-        linesContainer = findViewById(R.id.linesContainer)
-        radioGroup     = findViewById(R.id.radioGroup)
-        editValue      = findViewById(R.id.editValue)
-        rgRange        = findViewById(R.id.rgRangeSize)
+        linesContainer   = findViewById(R.id.linesContainer)
+        radioGroup       = findViewById(R.id.radioGroup)
+        editValue        = findViewById(R.id.editValue)
+        rgRange          = findViewById(R.id.rgRangeSize)
+        btnToggleOverlay = findViewById(R.id.btnToggleOverlay)
 
         // ── Загружаем сохранённые настройки ─────────────────────────────
         val config    = WidgetPreferences.load(this, WidgetPreferences.DEFAULT_WIDGET_ID)
@@ -53,6 +55,22 @@ class WidgetActivity : Activity() {
 
         for (entry in entries) addEntryRow(entry)
 
+        // ── Кнопка Включить / Выключить ──────────────────────────────────
+        updateToggleButton()
+        btnToggleOverlay.setOnClickListener {
+            val nowEnabled = OverlaySettings.isEnabled(this)
+            if (nowEnabled) {
+                startService(Intent(this, OverlayService::class.java).apply {
+                    action = OverlayService.ACTION_STOP
+                })
+            } else {
+                startForegroundService(Intent(this, OverlayService::class.java).apply {
+                    action = OverlayService.ACTION_START
+                })
+            }
+            updateToggleButton()
+        }
+
         // ── Слушатели авто-сохранения ────────────────────────────────────
         radioGroup.setOnCheckedChangeListener { _, _ -> debouncedSave() }
         rgRange.setOnCheckedChangeListener    { _, _ -> debouncedSave() }
@@ -62,22 +80,18 @@ class WidgetActivity : Activity() {
             override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
         })
 
-        // ── Кнопка «+ Добавить» ──────────────────────────────────────────
+        // ── Кнопка «+» ──────────────────────────────────────────────────
         findViewById<Button>(R.id.btnAddLine).setOnClickListener {
             addEntryRow(OverlayEntry())
             debouncedSave()
         }
 
-        // ── Кнопка «Сохранить» (мгновенное применение) ──────────────────
-        findViewById<Button>(R.id.btnSave).setOnClickListener {
-            saveHandler.removeCallbacks(saveRunnable)
-            commitAndRestart()
+        // ── Авто-запуск оверлея (если был включён) ───────────────────────
+        if (OverlaySettings.isEnabled(this)) {
+            startForegroundService(Intent(this, OverlayService::class.java).apply {
+                action = OverlayService.ACTION_START
+            })
         }
-
-        // ── Авто-запуск оверлея ──────────────────────────────────────────
-        startForegroundService(Intent(this, OverlayService::class.java).apply {
-            action = OverlayService.ACTION_START
-        })
     }
 
     override fun onDestroy() {
@@ -85,28 +99,33 @@ class WidgetActivity : Activity() {
         super.onDestroy()
     }
 
+    private fun updateToggleButton() {
+        val isOn = OverlaySettings.isEnabled(this)
+        btnToggleOverlay.text = if (isOn) "Выключить" else "Включить"
+    }
+
     // ── Добавить строку записи ────────────────────────────────────────────
     private fun addEntryRow(entry: OverlayEntry) {
         val row = LayoutInflater.from(this).inflate(R.layout.line_item, linesContainer, false)
 
-        val cbBattery    = row.findViewById<CheckBox>(R.id.cbBattery)
-        val cbFuel       = row.findViewById<CheckBox>(R.id.cbFuel)
-        val layBatOpts   = row.findViewById<LinearLayout>(R.id.layBatOptions)
-        val layFuelOpts  = row.findViewById<LinearLayout>(R.id.layFuelOptions)
+        val cbBattery   = row.findViewById<CheckBox>(R.id.cbBattery)
+        val cbFuel      = row.findViewById<CheckBox>(R.id.cbFuel)
+        val cbCombine   = row.findViewById<CheckBox>(R.id.cbCombine)
+        val layBatOpts  = row.findViewById<LinearLayout>(R.id.layBatOptions)
+        val layFuelOpts = row.findViewById<LinearLayout>(R.id.layFuelOptions)
 
-        // Установить начальные значения
+        // Начальные значения
         cbBattery.isChecked = entry.batteryEnabled
         cbFuel.isChecked    = entry.fuelEnabled
+        cbCombine.isChecked = entry.combineLine
         layBatOpts.visibility  = if (entry.batteryEnabled) View.VISIBLE else View.GONE
         layFuelOpts.visibility = if (entry.fuelEnabled)   View.VISIBLE else View.GONE
 
-        row.findViewById<RadioGroup>(R.id.rgBatDisplay).check(
-            if (entry.batteryDisplay == OverlayLineDisplay.KM) R.id.rbBatKm else R.id.rbBatPct)
-        row.findViewById<RadioGroup>(R.id.rgBatSize).check(lineSizeToRadioId(entry.batterySizeSp, bat = true))
+        row.findViewById<RadioGroup>(R.id.rgBatDisplay).check(batDisplayToRadioId(entry.batteryDisplay))
+        row.findViewById<RadioGroup>(R.id.rgBatSize).check(sizeToRadioId(entry.batterySizeSp, bat = true))
 
-        row.findViewById<RadioGroup>(R.id.rgFuelDisplay).check(
-            if (entry.fuelDisplay == OverlayLineDisplay.KM) R.id.rbFuelKm else R.id.rbFuelPct)
-        row.findViewById<RadioGroup>(R.id.rgFuelSize).check(lineSizeToRadioId(entry.fuelSizeSp, bat = false))
+        row.findViewById<RadioGroup>(R.id.rgFuelDisplay).check(fuelDisplayToRadioId(entry.fuelDisplay))
+        row.findViewById<RadioGroup>(R.id.rgFuelSize).check(sizeToRadioId(entry.fuelSizeSp, bat = false))
 
         // Показать/скрыть опции при смене галочек
         val toggleOpts = CompoundButton.OnCheckedChangeListener { btn, checked ->
@@ -118,6 +137,7 @@ class WidgetActivity : Activity() {
         }
         cbBattery.setOnCheckedChangeListener(toggleOpts)
         cbFuel.setOnCheckedChangeListener(toggleOpts)
+        cbCombine.setOnCheckedChangeListener { _, _ -> debouncedSave() }
 
         // Любое изменение RadioGroup → авто-сохранение
         listOf(R.id.rgBatDisplay, R.id.rgBatSize, R.id.rgFuelDisplay, R.id.rgFuelSize).forEach { id ->
@@ -139,13 +159,12 @@ class WidgetActivity : Activity() {
     private fun readEntries(): List<OverlayEntry> = entryViews.map { row ->
         OverlayEntry(
             batteryEnabled = row.findViewById<CheckBox>(R.id.cbBattery).isChecked,
-            batteryDisplay = if (row.findViewById<RadioButton>(R.id.rbBatKm).isChecked)
-                OverlayLineDisplay.KM else OverlayLineDisplay.PERCENT,
-            batterySizeSp  = readLineSize(row, bat = true),
+            batteryDisplay = readBatDisplay(row),
+            batterySizeSp  = readSize(row, bat = true),
             fuelEnabled    = row.findViewById<CheckBox>(R.id.cbFuel).isChecked,
-            fuelDisplay    = if (row.findViewById<RadioButton>(R.id.rbFuelKm).isChecked)
-                OverlayLineDisplay.KM else OverlayLineDisplay.PERCENT,
-            fuelSizeSp     = readLineSize(row, bat = false)
+            fuelDisplay    = readFuelDisplay(row),
+            fuelSizeSp     = readSize(row, bat = false),
+            combineLine    = row.findViewById<CheckBox>(R.id.cbCombine).isChecked
         )
     }
 
@@ -159,7 +178,9 @@ class WidgetActivity : Activity() {
         OverlaySettings.saveRangeSize(this, radioToRangeSize(rgRange.checkedRadioButtonId))
         OverlaySettings.saveEntries(this, readEntries())
 
-        // Стоп → небольшая пауза → старт
+        // Перезапуск только если оверлей включён
+        if (!OverlaySettings.isEnabled(this)) return
+
         startService(Intent(this, OverlayService::class.java).apply { action = OverlayService.ACTION_STOP })
         Handler(Looper.getMainLooper()).postDelayed({
             startForegroundService(Intent(this, OverlayService::class.java).apply {
@@ -168,39 +189,60 @@ class WidgetActivity : Activity() {
         }, 400)
     }
 
-    // ── Маппинг ID ↔ размер ───────────────────────────────────────────────
+    // ── Маппинг ID ↔ размер ────────────────────────────────────────────────
 
     private fun rangeSizeToRadioId(sp: Int): Int = when (sp) {
-        OverlayLine.RANGE_SIZE_S  -> R.id.rgRangeS
-        OverlayLine.RANGE_SIZE_L  -> R.id.rgRangeL
-        OverlayLine.RANGE_SIZE_XL -> R.id.rgRangeXL
-        else                      -> R.id.rgRangeM
+        OverlayLine.SIZE_S  -> R.id.rgRangeS
+        OverlayLine.SIZE_M  -> R.id.rgRangeM
+        OverlayLine.SIZE_XL -> R.id.rgRangeXL
+        else                -> R.id.rgRangeL   // SIZE_L — дефолт
     }
 
     private fun radioToRangeSize(id: Int): Int = when (id) {
-        R.id.rgRangeS  -> OverlayLine.RANGE_SIZE_S
-        R.id.rgRangeL  -> OverlayLine.RANGE_SIZE_L
-        R.id.rgRangeXL -> OverlayLine.RANGE_SIZE_XL
-        else            -> OverlayLine.RANGE_SIZE_M
+        R.id.rgRangeS  -> OverlayLine.SIZE_S
+        R.id.rgRangeM  -> OverlayLine.SIZE_M
+        R.id.rgRangeXL -> OverlayLine.SIZE_XL
+        else            -> OverlayLine.SIZE_L
     }
 
-    private fun lineSizeToRadioId(sp: Int, bat: Boolean): Int = when (sp) {
-        OverlayLine.LINE_SIZE_S  -> if (bat) R.id.rbBatS  else R.id.rbFuelS
-        OverlayLine.LINE_SIZE_L  -> if (bat) R.id.rbBatL  else R.id.rbFuelL
-        OverlayLine.LINE_SIZE_XL -> if (bat) R.id.rbBatXL else R.id.rbFuelXL
-        else                     -> if (bat) R.id.rbBatM  else R.id.rbFuelM
+    private fun sizeToRadioId(sp: Int, bat: Boolean): Int = when (sp) {
+        OverlayLine.SIZE_S  -> if (bat) R.id.rbBatS  else R.id.rbFuelS
+        OverlayLine.SIZE_M  -> if (bat) R.id.rbBatM  else R.id.rbFuelM
+        OverlayLine.SIZE_XL -> if (bat) R.id.rbBatXL else R.id.rbFuelXL
+        else                -> if (bat) R.id.rbBatL  else R.id.rbFuelL   // SIZE_L
     }
 
-    private fun readLineSize(row: View, bat: Boolean): Int {
+    private fun readSize(row: View, bat: Boolean): Int {
         val (sId, mId, lId, xlId) = if (bat)
             listOf(R.id.rbBatS, R.id.rbBatM, R.id.rbBatL, R.id.rbBatXL)
         else
             listOf(R.id.rbFuelS, R.id.rbFuelM, R.id.rbFuelL, R.id.rbFuelXL)
         return when {
-            row.findViewById<RadioButton>(sId) .isChecked -> OverlayLine.LINE_SIZE_S
-            row.findViewById<RadioButton>(lId) .isChecked -> OverlayLine.LINE_SIZE_L
-            row.findViewById<RadioButton>(xlId).isChecked -> OverlayLine.LINE_SIZE_XL
-            else                                          -> OverlayLine.LINE_SIZE_M
+            row.findViewById<RadioButton>(sId) .isChecked -> OverlayLine.SIZE_S
+            row.findViewById<RadioButton>(mId) .isChecked -> OverlayLine.SIZE_M
+            row.findViewById<RadioButton>(xlId).isChecked -> OverlayLine.SIZE_XL
+            else                                          -> OverlayLine.SIZE_L
         }
+    }
+
+    // Батарея: км | %
+    private fun batDisplayToRadioId(d: OverlayLineDisplay): Int = when (d) {
+        OverlayLineDisplay.KM      -> R.id.rbBatKm
+        else                       -> R.id.rbBatPercent
+    }
+    private fun readBatDisplay(row: View): OverlayLineDisplay =
+        if (row.findViewById<RadioButton>(R.id.rbBatKm).isChecked) OverlayLineDisplay.KM
+        else OverlayLineDisplay.PERCENT
+
+    // Топливо: км | л | %
+    private fun fuelDisplayToRadioId(d: OverlayLineDisplay): Int = when (d) {
+        OverlayLineDisplay.KM     -> R.id.rbFuelKm
+        OverlayLineDisplay.LITERS -> R.id.rbFuelLiters
+        else                      -> R.id.rbFuelPercent
+    }
+    private fun readFuelDisplay(row: View): OverlayLineDisplay = when {
+        row.findViewById<RadioButton>(R.id.rbFuelKm)    .isChecked -> OverlayLineDisplay.KM
+        row.findViewById<RadioButton>(R.id.rbFuelLiters).isChecked -> OverlayLineDisplay.LITERS
+        else                                                        -> OverlayLineDisplay.PERCENT
     }
 }

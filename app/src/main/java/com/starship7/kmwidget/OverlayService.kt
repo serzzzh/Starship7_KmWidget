@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.graphics.Rect
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -103,29 +102,15 @@ class OverlayService : Service() {
         }
 
         val view = LayoutInflater.from(this).inflate(R.layout.overlay_range, null)
-
-        // Кнопка выключения
-        view.findViewById<TextView>(R.id.overlay_power_btn).setOnClickListener {
-            OverlaySettings.setEnabled(this, false)
-            removeOverlay(); stopSelf()
-        }
-
         setupDrag(view)
         overlayView = view
         windowManager.addView(view, params)
         handler.post(updateRunnable)
     }
 
-    // ── Drag (исключает зону power-кнопки) ─────────────────────────────
+    // ── Drag ─────────────────────────────────────────────────────────────
     private fun setupDrag(view: View) {
         view.setOnTouchListener { v, event ->
-            val powerBtn = view.findViewById<TextView>(R.id.overlay_power_btn)
-            val btnBounds = Rect()
-            powerBtn.getHitRect(btnBounds)
-            if (event.action == MotionEvent.ACTION_DOWN &&
-                btnBounds.contains(event.x.toInt(), event.y.toInt()))
-                return@setOnTouchListener false
-
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     dragInitialX = params.x; dragInitialY = params.y
@@ -151,7 +136,7 @@ class OverlayService : Service() {
         }
     }
 
-    // ── Обновление данных ───────────────────────────────────────────────
+    // ── Обновление данных ────────────────────────────────────────────────
     private fun updateOverlay() {
         val view = overlayView ?: return
         val vh   = vehicleHelper ?: return
@@ -159,7 +144,6 @@ class OverlayService : Service() {
 
         val result = RangeCalculator.calculateWithHelper(this, WidgetPreferences.DEFAULT_WIDGET_ID, db, vh)
 
-        // Собираем точку истории
         if (vh.isConnected) {
             val odo  = vh.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
             val bat  = vh.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
@@ -168,48 +152,72 @@ class OverlayService : Service() {
             if (odo > 0) db.insertLog(System.currentTimeMillis(), odo, bat, fuel)
         }
 
-        // Главная строка: размер из настроек
+        // Главная строка
         val rangeView = view.findViewById<TextView>(R.id.overlay_range)
         rangeView.text     = result.totalText
         rangeView.textSize = OverlaySettings.getRangeSize(this).toFloat()
 
-        // Дополнительные строки — рендерим заново
+        // Дополнительные строки
         val container = view.findViewById<LinearLayout>(R.id.overlay_lines)
         renderLines(container, result.snapshot)
     }
 
-    private fun renderLines(container: LinearLayout, snapshot: CarSnapshot) {
+    // ── Рендер доп. строк ────────────────────────────────────────────────
+    private fun renderLines(container: LinearLayout, s: CarSnapshot) {
         container.removeAllViews()
-        if (!snapshot.isConnected) return
+        if (!s.isConnected) return
 
-        val entries = OverlaySettings.loadEntries(this)
-        for (entry in entries) {
-            for (line in entry.toLines()) {
-                val text = formatLine(line, snapshot) ?: continue
-                val tv = TextView(this).apply {
-                    this.text = text
-                    textSize  = line.sizeSp.toFloat()
-                    setTextColor(Color.parseColor("#CCCCCC"))
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply { topMargin = 1 }
+        for (entry in OverlaySettings.loadEntries(this)) {
+            if (!entry.batteryEnabled && !entry.fuelEnabled) continue
+
+            // Комбинированная строка: батарея + бензин на одной
+            if (entry.combineLine && entry.batteryEnabled && entry.fuelEnabled) {
+                val batPart  = formatPart(OverlayLineType.BATTERY, entry.batteryDisplay, s)
+                val fuelPart = formatPart(OverlayLineType.FUEL,    entry.fuelDisplay,    s)
+                val combined = listOfNotNull(batPart, fuelPart).joinToString("  |  ")
+                if (combined.isNotEmpty()) {
+                    addTextView(container, combined,
+                        maxOf(entry.batterySizeSp, entry.fuelSizeSp))
                 }
-                container.addView(tv)
+            } else {
+                // Раздельные строки
+                if (entry.batteryEnabled) {
+                    val t = formatPart(OverlayLineType.BATTERY, entry.batteryDisplay, s)
+                    if (t != null) addTextView(container, t, entry.batterySizeSp)
+                }
+                if (entry.fuelEnabled) {
+                    val t = formatPart(OverlayLineType.FUEL, entry.fuelDisplay, s)
+                    if (t != null) addTextView(container, t, entry.fuelSizeSp)
+                }
             }
         }
     }
 
-    private fun formatLine(line: OverlayLine, s: CarSnapshot): String? = when {
-        line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.KM      ->
-            if (s.evRangeKm > 0)   "🔋 ${s.evRangeKm.toInt()} км"   else null
-        line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.PERCENT ->
-            if (s.batteryPct >= 0) "🔋 ${s.batteryPct.toInt()}%"     else null
-        line.type == OverlayLineType.FUEL    && line.display == OverlayLineDisplay.KM      ->
-            if (s.fuelRangeKm > 0) "⛽ ${s.fuelRangeKm.toInt()} км" else null
-        line.type == OverlayLineType.FUEL    && line.display == OverlayLineDisplay.PERCENT ->
-            if (s.fuelPct >= 0)    "⛽ ${s.fuelPct.toInt()}%"        else null
-        else -> null
+    private fun formatPart(type: OverlayLineType, display: OverlayLineDisplay, s: CarSnapshot): String? =
+        when {
+            type == OverlayLineType.BATTERY && display == OverlayLineDisplay.KM      ->
+                if (s.evRangeKm   > 0)  "🔋${s.evRangeKm.toInt()} км"    else null
+            type == OverlayLineType.BATTERY && display == OverlayLineDisplay.PERCENT ->
+                if (s.batteryPct  >= 0) "🔋${s.batteryPct.toInt()}%"      else null
+            type == OverlayLineType.FUEL    && display == OverlayLineDisplay.KM      ->
+                if (s.fuelRangeKm > 0)  "⛽${s.fuelRangeKm.toInt()} км"  else null
+            type == OverlayLineType.FUEL    && display == OverlayLineDisplay.LITERS  ->
+                if (s.fuelLiters  >= 0) "⛽${s.fuelLiters.toInt()} л"     else null
+            type == OverlayLineType.FUEL    && display == OverlayLineDisplay.PERCENT ->
+                if (s.fuelPct     >= 0) "⛽${s.fuelPct.toInt()}%"         else null
+            else -> null
+        }
+
+    private fun addTextView(container: LinearLayout, text: String, sizeSp: Int) {
+        container.addView(TextView(this).apply {
+            this.text = text
+            textSize  = sizeSp.toFloat()
+            setTextColor(Color.parseColor("#CCCCCC"))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 2 }
+        })
     }
 
     private fun removeOverlay() {
@@ -222,7 +230,7 @@ class OverlayService : Service() {
 
     private fun buildNotification() = Notification.Builder(this, "overlay_channel")
         .setContentTitle("Запас хода")
-        .setContentText("Нажмите ⏻ на оверлее чтобы выключить")
+        .setContentText("Оверлей активен — управляйте через настройки приложения")
         .build()
 
     private fun createNotificationChannel() {

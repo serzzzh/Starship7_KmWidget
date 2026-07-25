@@ -53,11 +53,11 @@ object OverlaySettings {
 
     // ── Размер строки "Запас хода" ────────────────────────────────────────
     fun getRangeSize(ctx: Context): Int =
-        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt("range_size", OverlayLine.RANGE_SIZE_M)
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt("range_size", OverlayLine.SIZE_L)
     fun saveRangeSize(ctx: Context, sp: Int) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putInt("range_size", sp).apply()
 
-    // ── Дополнительные записи (bat+fuel каждая) ──────────────────────────
+    // ── Дополнительные записи ────────────────────────────────────────────
     fun loadEntries(ctx: Context): List<OverlayEntry> {
         val p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val count = p.getInt("entry_count", 0)
@@ -65,11 +65,12 @@ object OverlaySettings {
             try {
                 OverlayEntry(
                     batteryEnabled = p.getBoolean("e${i}_bat_en",    true),
-                    batteryDisplay = OverlayLineDisplay.valueOf(p.getString("e${i}_bat_disp", "KM")!!),
-                    batterySizeSp  = p.getInt("e${i}_bat_sz",  OverlayLine.LINE_SIZE_M),
+                    batteryDisplay = OverlayLineDisplay.valueOf(p.getString("e${i}_bat_disp", "PERCENT")!!),
+                    batterySizeSp  = p.getInt("e${i}_bat_sz",  OverlayLine.SIZE_M),
                     fuelEnabled    = p.getBoolean("e${i}_fuel_en",   true),
                     fuelDisplay    = OverlayLineDisplay.valueOf(p.getString("e${i}_fuel_disp", "KM")!!),
-                    fuelSizeSp     = p.getInt("e${i}_fuel_sz", OverlayLine.LINE_SIZE_M)
+                    fuelSizeSp     = p.getInt("e${i}_fuel_sz", OverlayLine.SIZE_M),
+                    combineLine    = p.getBoolean("e${i}_combine",   true)
                 )
             } catch (_: Exception) { null }
         }
@@ -85,28 +86,28 @@ object OverlaySettings {
                 putBoolean("e${i}_fuel_en",   e.fuelEnabled)
                 putString ("e${i}_fuel_disp", e.fuelDisplay.name)
                 putInt    ("e${i}_fuel_sz",    e.fuelSizeSp)
+                putBoolean("e${i}_combine",   e.combineLine)
             }
             apply()
         }
     }
 
-    // Legacy alias
-    fun loadLines(ctx: Context): List<OverlayLine> =
-        loadEntries(ctx).flatMap { it.toLines() }
-    fun saveLines(ctx: Context, lines: List<OverlayLine>) { /* no-op — use saveEntries */ }
+    // Legacy
+    fun loadLines(ctx: Context): List<OverlayLine> = loadEntries(ctx).flatMap { it.toLines() }
+    fun saveLines(ctx: Context, lines: List<OverlayLine>) { /* use saveEntries */ }
 }
 
-// ── Legacy (used by old code paths only) ──────────────────────────────────
+// ── Legacy alias (не используется в новом коде) ────────────────────────────
 data class OverlayDisplayConfig(
-    val totalSizeSp: Int     = OverlayLine.RANGE_SIZE_M,
-    val breakdownSizeSp: Int = OverlayLine.LINE_SIZE_M,
-    val infoSizeSp: Int      = OverlayLine.LINE_SIZE_S
+    val totalSizeSp: Int     = OverlayLine.SIZE_L,
+    val breakdownSizeSp: Int = OverlayLine.SIZE_M,
+    val infoSizeSp: Int      = OverlayLine.SIZE_S
 ) {
     companion object {
         const val SIZE_OFF = 0
-        const val SIZE_S   = OverlayLine.LINE_SIZE_S
-        const val SIZE_M   = OverlayLine.LINE_SIZE_M
-        const val SIZE_L   = OverlayLine.LINE_SIZE_L
-        const val SIZE_XL  = OverlayLine.LINE_SIZE_XL
+        const val SIZE_S   = OverlayLine.SIZE_S
+        const val SIZE_M   = OverlayLine.SIZE_M
+        const val SIZE_L   = OverlayLine.SIZE_L
+        const val SIZE_XL  = OverlayLine.SIZE_XL
     }
 }

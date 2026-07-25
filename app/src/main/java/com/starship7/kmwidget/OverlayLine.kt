@@ -1,40 +1,43 @@
 package com.starship7.kmwidget
 
 enum class OverlayLineType    { BATTERY, FUEL }
-enum class OverlayLineDisplay { KM, PERCENT }
+enum class OverlayLineDisplay { KM, LITERS, PERCENT }
 
-/** Одна отображаемая строка (внутреннее использование). */
+/** Одна отображаемая строка (внутренняя). */
 data class OverlayLine(
     val type: OverlayLineType       = OverlayLineType.BATTERY,
-    val display: OverlayLineDisplay = OverlayLineDisplay.KM,
-    val sizeSp: Int                 = OverlayLine.LINE_SIZE_M
+    val display: OverlayLineDisplay = OverlayLineDisplay.PERCENT,
+    val sizeSp: Int                 = SIZE_M
 ) {
     companion object {
-        const val LINE_SIZE_S  = 12
-        const val LINE_SIZE_M  = 16
-        const val LINE_SIZE_L  = 20
-        const val LINE_SIZE_XL = 26
+        // Единая шкала размеров для всех строк оверлея
+        const val SIZE_S  = 14
+        const val SIZE_M  = 20
+        const val SIZE_L  = 28
+        const val SIZE_XL = 38
 
-        const val RANGE_SIZE_S  = 20
-        const val RANGE_SIZE_M  = 28
-        const val RANGE_SIZE_L  = 36
-        const val RANGE_SIZE_XL = 46
+        // Объём бака Geely Galaxy Starship 7 (для перевода % → литры)
+        const val FUEL_TANK_LITERS = 55f
     }
 }
 
 /**
- * Одна запись настроек, добавляемая пользователем через «+».
- * Может включать батарею и/или топливо — у каждого свои км/% и размер.
+ * Одна запись настроек (кнопка «+»).
+ * Содержит батарею и/или топливо — каждое со своим стилем и размером.
+ * Если [combineLine] = true и оба включены — выводятся на ОДНОЙ строке.
  */
 data class OverlayEntry(
-    val batteryEnabled: Boolean         = true,
-    val batteryDisplay: OverlayLineDisplay = OverlayLineDisplay.KM,
-    val batterySizeSp: Int              = OverlayLine.LINE_SIZE_M,
-    val fuelEnabled: Boolean            = true,
-    val fuelDisplay: OverlayLineDisplay = OverlayLineDisplay.KM,
-    val fuelSizeSp: Int                 = OverlayLine.LINE_SIZE_M
+    val batteryEnabled: Boolean            = true,
+    val batteryDisplay: OverlayLineDisplay = OverlayLineDisplay.PERCENT,
+    val batterySizeSp: Int                 = OverlayLine.SIZE_M,
+
+    val fuelEnabled: Boolean               = true,
+    val fuelDisplay: OverlayLineDisplay    = OverlayLineDisplay.KM,
+    val fuelSizeSp: Int                    = OverlayLine.SIZE_M,
+
+    val combineLine: Boolean               = true   // оба на одной строке
 ) {
-    /** Развернуть в список строк для рендеринга */
+    /** Развернуть в список строк (для раздельного рендеринга). */
     fun toLines(): List<OverlayLine> = buildList {
         if (batteryEnabled) add(OverlayLine(OverlayLineType.BATTERY, batteryDisplay, batterySizeSp))
         if (fuelEnabled)    add(OverlayLine(OverlayLineType.FUEL,    fuelDisplay,    fuelSizeSp))

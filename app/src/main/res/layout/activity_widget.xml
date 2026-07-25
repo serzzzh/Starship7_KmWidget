@@ -10,13 +10,29 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Заголовок + кнопка Выключить/Включить -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Настройки оверлея"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="18dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="18dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Настройки оверлея"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnToggleOverlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Выключить"
+                android:textSize="13sp" />
+        </LinearLayout>
 
         <!-- ══ Запас хода: размер ════════════════════════════════════ -->
         <TextView
@@ -35,15 +51,16 @@
             android:layout_marginBottom="20dp">
             <RadioButton android:id="@+id/rgRangeS"  android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:text="S"
-                android:layout_marginEnd="10dp" />
+                android:minWidth="0dp" android:layout_marginEnd="10dp" />
             <RadioButton android:id="@+id/rgRangeM"  android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:text="M"
-                android:checked="true" android:layout_marginEnd="10dp" />
+                android:minWidth="0dp" android:layout_marginEnd="10dp" />
             <RadioButton android:id="@+id/rgRangeL"  android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:text="L"
-                android:layout_marginEnd="10dp" />
+                android:checked="true" android:minWidth="0dp" android:layout_marginEnd="10dp" />
             <RadioButton android:id="@+id/rgRangeXL" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="XL" />
+                android:layout_height="wrap_content" android:text="XL"
+                android:minWidth="0dp" />
         </RadioGroup>
 
         <!-- ══ Дополнительные строки ═════════════════════════════════ -->
@@ -66,8 +83,10 @@
                 android:id="@+id/btnAddLine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+ Добавить"
-                android:textSize="13sp" />
+                android:text="+"
+                android:textSize="18sp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -106,15 +125,7 @@
             android:layout_height="wrap_content"
             android:hint="Значение"
             android:inputType="numberDecimal"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="20dp" />
-
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="✓  Сохранить и применить"
-            android:textSize="15sp" />
+            android:layout_marginTop="6dp" />
 
     </LinearLayout>
 </ScrollView>
