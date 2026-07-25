@@ -51,6 +51,18 @@ class OverlayService : Service() {
     private var dragTouchX   = 0f; private var dragTouchY   = 0f
     private var isDragging   = false
 
+    // Длинный тап → открыть настройки
+    private val longPressHandler = Handler(Looper.getMainLooper())
+    private val longPressRunnable = Runnable {
+        if (!isDragging) openSettings()
+    }
+    private fun openSettings() {
+        val intent = Intent(this, WidgetActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        startActivity(intent)
+    }
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
@@ -79,6 +91,7 @@ class OverlayService : Service() {
 
     override fun onDestroy() {
         handler.removeCallbacks(updateRunnable)
+        longPressHandler.removeCallbacks(longPressRunnable)
         removeOverlay()
         super.onDestroy()
     }
@@ -108,19 +121,24 @@ class OverlayService : Service() {
         handler.post(updateRunnable)
     }
 
-    // ── Drag ─────────────────────────────────────────────────────────────
+    // ── Drag + длинный тап → настройки ──────────────────────────────────
     private fun setupDrag(view: View) {
         view.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     dragInitialX = params.x; dragInitialY = params.y
                     dragTouchX = event.rawX; dragTouchY = event.rawY
-                    isDragging = false; true
+                    isDragging = false
+                    longPressHandler.postDelayed(longPressRunnable, 600)
+                    true
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val dx = (event.rawX - dragTouchX).toInt()
                     val dy = (event.rawY - dragTouchY).toInt()
-                    if (!isDragging && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) isDragging = true
+                    if (!isDragging && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+                        isDragging = true
+                        longPressHandler.removeCallbacks(longPressRunnable)
+                    }
                     if (isDragging) {
                         params.x = dragInitialX + dx; params.y = dragInitialY + dy
                         try { windowManager.updateViewLayout(v, params) } catch (_: Exception) {}
@@ -128,6 +146,7 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
+                    longPressHandler.removeCallbacks(longPressRunnable)
                     if (isDragging) OverlaySettings.savePosition(this, params.x, params.y)
                     isDragging = false; true
                 }

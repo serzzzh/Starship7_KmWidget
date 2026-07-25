@@ -165,7 +165,7 @@
             android:text="✕"
             android:textSize="14sp"
             android:textColor="#FF6666"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="@android:color/transparent"
             android:padding="4dp" />
     </LinearLayout>
 
