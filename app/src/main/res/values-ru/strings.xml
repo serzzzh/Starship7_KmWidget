@@ -16,4 +16,7 @@
     <string name="widget_bind_failed">Не удалось открыть галерею виджетов. Используйте редактор рабочего стола и выберите Range Widget.</string>
     <string name="widget_picker_opened">Галерея виджетов открыта. Выберите Range Widget и добавьте на рабочий стол.</string>
     <string name="widget_shortcut_name">Range Widget</string>
+    <string name="overlay_enable">Включить плавающий оверлей</string>
+    <string name="overlay_disable">Выключить плавающий оверлей</string>
+    <string name="overlay_hint">Оверлей показывается поверх любого экрана и обновляется каждые 30 секунд. Перетаскивайте для изменения позиции.</string>
 </resources>

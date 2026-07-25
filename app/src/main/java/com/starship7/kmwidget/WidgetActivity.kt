@@ -25,6 +25,7 @@ class WidgetActivity : Activity() {
         val editValue = findViewById<EditText>(R.id.editValue)
         val btnAddWidget = findViewById<Button>(R.id.btnAddWidget)
         val btnRefresh = findViewById<Button>(R.id.btnRefresh)
+        val btnOverlay = findViewById<Button>(R.id.btnOverlay)
 
         val config = WidgetPreferences.load(this, WidgetPreferences.DEFAULT_WIDGET_ID)
         if (config.isTimeBased) {
@@ -50,8 +51,33 @@ class WidgetActivity : Activity() {
             updateExistingWidgets()
         }
 
+        btnOverlay.setOnClickListener {
+            toggleOverlay(btnOverlay)
+        }
+
+        updateOverlayButton(btnOverlay)
         refreshPreview()
         updateStatusText()
+    }
+
+    private fun toggleOverlay(btn: Button) {
+        val isEnabled = OverlayService.isEnabled(this)
+        if (isEnabled) {
+            startService(Intent(this, OverlayService::class.java).apply {
+                action = OverlayService.ACTION_STOP
+            })
+            btn.text = getString(R.string.overlay_enable)
+        } else {
+            startForegroundService(Intent(this, OverlayService::class.java).apply {
+                action = OverlayService.ACTION_START
+            })
+            btn.text = getString(R.string.overlay_disable)
+        }
+    }
+
+    private fun updateOverlayButton(btn: Button) {
+        btn.text = if (OverlayService.isEnabled(this)) getString(R.string.overlay_disable)
+                   else getString(R.string.overlay_enable)
     }
 
     override fun onResume() {

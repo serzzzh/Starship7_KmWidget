@@ -110,10 +110,17 @@
             android:text="@string/widget_refresh"
             android:layout_marginTop="8dp" />
 
+        <Button
+            android:id="@+id/btnOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/overlay_enable"
+            android:layout_marginTop="8dp" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/widget_flyme_hint"
+            android:text="@string/overlay_hint"
             android:textSize="12sp"
             android:layout_marginTop="16dp" />
     </LinearLayout>
