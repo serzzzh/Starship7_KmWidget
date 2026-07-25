@@ -69,7 +69,7 @@ class RangeWidgetProvider : AppWidgetProvider() {
             result: RangeCalculator.RangeResult
         ) {
             val views = android.widget.RemoteViews(context.packageName, R.layout.widget_range)
-            views.setTextViewText(R.id.textRange, result.rangeText)
+            views.setTextViewText(R.id.textRange, result.totalText)
             views.setTextViewText(R.id.textInfo, result.infoText)
 
             val configIntent = Intent(context, ConfigActivity::class.java).apply {

@@ -101,7 +101,7 @@ class WidgetActivity : Activity() {
 
     private fun refreshPreview() {
         val result = RangeCalculator.calculate(this, WidgetPreferences.DEFAULT_WIDGET_ID)
-        findViewById<TextView>(R.id.textRange).text = result.rangeText
+        findViewById<TextView>(R.id.textRange).text = result.totalText
         findViewById<TextView>(R.id.textInfo).text = result.infoText
     }
 
