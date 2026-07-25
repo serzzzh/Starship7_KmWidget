@@ -50,7 +50,7 @@ class RangeUpdateService : Service() {
 
         val odometer = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
         val battery = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
-        val fuel = vehicleHelper.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 1).toFloat()
+        val fuel = vehicleHelper.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 0).toFloat()
 
         Log.i(TAG, "Collected: ODO=$odometer, BAT=$battery, FUEL=$fuel")
 

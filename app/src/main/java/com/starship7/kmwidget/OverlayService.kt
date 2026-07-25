@@ -154,15 +154,17 @@ class OverlayService : Service() {
         val config = WidgetPreferences.load(this, WidgetPreferences.DEFAULT_WIDGET_ID)
         val result = RangeCalculator.calculateWithHelper(this, WidgetPreferences.DEFAULT_WIDGET_ID, db, vh)
 
-        // Also collect current data point
+        // Also collect current data point for history-based calculation
         if (vh.isConnected) {
-            val odo = vh.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
-            val bat = vh.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
-            val fuel = vh.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 1).toFloat()
+            val odo  = vh.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
+            val bat  = vh.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
+            val fuel = vh.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 0).toFloat()
+            Log.i(TAG, "Overlay collected: ODO=$odo BAT=$bat FUEL=$fuel | result=${result.rangeText}")
             if (odo > 0) {
                 db.insertLog(System.currentTimeMillis(), odo, bat, fuel)
-                Log.i(TAG, "Overlay collected: ODO=$odo BAT=$bat FUEL=$fuel")
             }
+        } else {
+            Log.w(TAG, "Car API not connected in overlay update")
         }
 
         view.findViewById<TextView>(R.id.overlay_range).text = result.rangeText
