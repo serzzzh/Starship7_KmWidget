@@ -182,34 +182,34 @@ class OverlayService : Service() {
         container.removeAllViews()
         if (!snapshot.isConnected) return
 
-        val lines = OverlaySettings.loadLines(this)
-        for (line in lines) {
-            val text = formatLine(line, snapshot) ?: continue
-            val tv = TextView(this).apply {
-                this.text = text
-                textSize  = line.sizeSp.toFloat()
-                setTextColor(Color.parseColor("#CCCCCC"))
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = 1 }
+        val entries = OverlaySettings.loadEntries(this)
+        for (entry in entries) {
+            for (line in entry.toLines()) {
+                val text = formatLine(line, snapshot) ?: continue
+                val tv = TextView(this).apply {
+                    this.text = text
+                    textSize  = line.sizeSp.toFloat()
+                    setTextColor(Color.parseColor("#CCCCCC"))
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { topMargin = 1 }
+                }
+                container.addView(tv)
             }
-            container.addView(tv)
         }
     }
 
-    private fun formatLine(line: OverlayLine, s: CarSnapshot): String? {
-        return when {
-            line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.KM ->
-                if (s.evRangeKm > 0) "🔋 ${s.evRangeKm.toInt()} км" else null
-            line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.PERCENT ->
-                if (s.batteryPct >= 0) "🔋 ${s.batteryPct.toInt()}%" else null
-            line.type == OverlayLineType.FUEL && line.display == OverlayLineDisplay.KM ->
-                if (s.fuelRangeKm > 0) "⛽ ${s.fuelRangeKm.toInt()} км" else null
-            line.type == OverlayLineType.FUEL && line.display == OverlayLineDisplay.PERCENT ->
-                if (s.fuelPct >= 0) "⛽ ${s.fuelPct.toInt()}%" else null
-            else -> null
-        }
+    private fun formatLine(line: OverlayLine, s: CarSnapshot): String? = when {
+        line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.KM      ->
+            if (s.evRangeKm > 0)   "🔋 ${s.evRangeKm.toInt()} км"   else null
+        line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.PERCENT ->
+            if (s.batteryPct >= 0) "🔋 ${s.batteryPct.toInt()}%"     else null
+        line.type == OverlayLineType.FUEL    && line.display == OverlayLineDisplay.KM      ->
+            if (s.fuelRangeKm > 0) "⛽ ${s.fuelRangeKm.toInt()} км" else null
+        line.type == OverlayLineType.FUEL    && line.display == OverlayLineDisplay.PERCENT ->
+            if (s.fuelPct >= 0)    "⛽ ${s.fuelPct.toInt()}%"        else null
+        else -> null
     }
 
     private fun removeOverlay() {

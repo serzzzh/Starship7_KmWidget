@@ -57,32 +57,43 @@ object OverlaySettings {
     fun saveRangeSize(ctx: Context, sp: Int) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putInt("range_size", sp).apply()
 
-    // ── Дополнительные строки ─────────────────────────────────────────────
-    fun loadLines(ctx: Context): List<OverlayLine> {
+    // ── Дополнительные записи (bat+fuel каждая) ──────────────────────────
+    fun loadEntries(ctx: Context): List<OverlayEntry> {
         val p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val count = p.getInt("line_count", 0)
+        val count = p.getInt("entry_count", 0)
         return (0 until count).mapNotNull { i ->
             try {
-                OverlayLine(
-                    type    = OverlayLineType.valueOf(p.getString("line_${i}_type", "BATTERY")!!),
-                    display = OverlayLineDisplay.valueOf(p.getString("line_${i}_display", "KM")!!),
-                    sizeSp  = p.getInt("line_${i}_size", OverlayLine.LINE_SIZE_M)
+                OverlayEntry(
+                    batteryEnabled = p.getBoolean("e${i}_bat_en",    true),
+                    batteryDisplay = OverlayLineDisplay.valueOf(p.getString("e${i}_bat_disp", "KM")!!),
+                    batterySizeSp  = p.getInt("e${i}_bat_sz",  OverlayLine.LINE_SIZE_M),
+                    fuelEnabled    = p.getBoolean("e${i}_fuel_en",   true),
+                    fuelDisplay    = OverlayLineDisplay.valueOf(p.getString("e${i}_fuel_disp", "KM")!!),
+                    fuelSizeSp     = p.getInt("e${i}_fuel_sz", OverlayLine.LINE_SIZE_M)
                 )
             } catch (_: Exception) { null }
         }
     }
 
-    fun saveLines(ctx: Context, lines: List<OverlayLine>) {
+    fun saveEntries(ctx: Context, entries: List<OverlayEntry>) {
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().apply {
-            putInt("line_count", lines.size)
-            lines.forEachIndexed { i, line ->
-                putString("line_${i}_type",    line.type.name)
-                putString("line_${i}_display", line.display.name)
-                putInt("line_${i}_size",       line.sizeSp)
+            putInt("entry_count", entries.size)
+            entries.forEachIndexed { i, e ->
+                putBoolean("e${i}_bat_en",    e.batteryEnabled)
+                putString ("e${i}_bat_disp",  e.batteryDisplay.name)
+                putInt    ("e${i}_bat_sz",     e.batterySizeSp)
+                putBoolean("e${i}_fuel_en",   e.fuelEnabled)
+                putString ("e${i}_fuel_disp", e.fuelDisplay.name)
+                putInt    ("e${i}_fuel_sz",    e.fuelSizeSp)
             }
             apply()
         }
     }
+
+    // Legacy alias
+    fun loadLines(ctx: Context): List<OverlayLine> =
+        loadEntries(ctx).flatMap { it.toLines() }
+    fun saveLines(ctx: Context, lines: List<OverlayLine>) { /* no-op — use saveEntries */ }
 }
 
 // ── Legacy (used by old code paths only) ──────────────────────────────────

@@ -1,96 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Одна настраиваемая строка оверлея -->
+<!-- Одна запись: батарея + топливо с независимыми настройками -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="4dp"
+    android:orientation="vertical"
     android:background="#11FFFFFF"
-    android:layout_marginBottom="4dp">
+    android:padding="8dp"
+    android:layout_marginBottom="6dp">
 
-    <!-- Тип: 🔋 / ⛽ -->
-    <RadioGroup
-        android:id="@+id/rgType"
-        android:layout_width="wrap_content"
+    <!-- ── Строка батареи ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginEnd="8dp">
-        <RadioButton
-            android:id="@+id/rbBattery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🔋"
-            android:textSize="18sp"
-            android:checked="true"
-            android:button="@null"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="6dp"
-            android:background="@android:drawable/btn_radio" />
-        <RadioButton
-            android:id="@+id/rbFuel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="⛽"
-            android:textSize="18sp"
-            android:button="@null"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="6dp"
-            android:background="@android:drawable/btn_radio" />
-    </RadioGroup>
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
 
-    <!-- Отображение: км / % -->
-    <RadioGroup
-        android:id="@+id/rgDisplay"
-        android:layout_width="wrap_content"
+        <CheckBox
+            android:id="@+id/cbBattery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔋 Батарея"
+            android:textSize="14sp"
+            android:checked="true"
+            android:minWidth="0dp"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Опции батареи (прячутся при снятии галочки) -->
+        <LinearLayout
+            android:id="@+id/layBatOptions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <RadioGroup
+                android:id="@+id/rgBatDisplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="8dp">
+                <RadioButton android:id="@+id/rbBatKm"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="км"
+                    android:textSize="13sp" android:checked="true"
+                    android:layout_marginEnd="4dp" />
+                <RadioButton android:id="@+id/rbBatPct" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="%"
+                    android:textSize="13sp" />
+            </RadioGroup>
+
+            <RadioGroup
+                android:id="@+id/rgBatSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <RadioButton android:id="@+id/rbBatS"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="S"
+                    android:textSize="12sp" android:layout_marginEnd="2dp" />
+                <RadioButton android:id="@+id/rbBatM"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="M"
+                    android:textSize="12sp" android:checked="true"
+                    android:layout_marginEnd="2dp" />
+                <RadioButton android:id="@+id/rbBatL"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="L"
+                    android:textSize="12sp" android:layout_marginEnd="2dp" />
+                <RadioButton android:id="@+id/rbBatXL" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="XL"
+                    android:textSize="12sp" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- Кнопка удалить (только в строке батареи) -->
+        <Button
+            android:id="@+id/btnDeleteEntry"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:text="✕"
+            android:textSize="13sp"
+            android:padding="0dp"
+            android:layout_marginStart="4dp"
+            android:backgroundTint="#663333" />
+    </LinearLayout>
+
+    <!-- ── Строка топлива ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginEnd="8dp">
-        <RadioButton
-            android:id="@+id/rbKm"
+        android:gravity="center_vertical">
+
+        <CheckBox
+            android:id="@+id/cbFuel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="км"
+            android:text="⛽ Бензин"
             android:textSize="14sp"
             android:checked="true"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="6dp" />
-        <RadioButton
-            android:id="@+id/rbPct"
-            android:layout_width="wrap_content"
+            android:minWidth="0dp"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Опции топлива -->
+        <LinearLayout
+            android:id="@+id/layFuelOptions"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="%"
-            android:textSize="14sp"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="6dp" />
-    </RadioGroup>
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <!-- Размер: S / M / L / XL -->
-    <RadioGroup
-        android:id="@+id/rgSize"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-        <RadioButton android:id="@+id/rbS"  android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="S"  android:textSize="13sp" android:gravity="center" />
-        <RadioButton android:id="@+id/rbM"  android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="M"  android:textSize="13sp" android:gravity="center" android:checked="true" />
-        <RadioButton android:id="@+id/rbL"  android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="L"  android:textSize="13sp" android:gravity="center" />
-        <RadioButton android:id="@+id/rbXL" android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="XL" android:textSize="13sp" android:gravity="center" />
-    </RadioGroup>
+            <RadioGroup
+                android:id="@+id/rgFuelDisplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="8dp">
+                <RadioButton android:id="@+id/rbFuelKm"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="км"
+                    android:textSize="13sp" android:checked="true"
+                    android:layout_marginEnd="4dp" />
+                <RadioButton android:id="@+id/rbFuelPct" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="%"
+                    android:textSize="13sp" />
+            </RadioGroup>
 
-    <!-- Удалить -->
-    <Button
-        android:id="@+id/btnDeleteLine"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:text="✕"
-        android:textSize="14sp"
-        android:padding="0dp"
-        android:layout_marginStart="6dp"
-        android:backgroundTint="#AA444444" />
+            <RadioGroup
+                android:id="@+id/rgFuelSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <RadioButton android:id="@+id/rbFuelS"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="S"
+                    android:textSize="12sp" android:layout_marginEnd="2dp" />
+                <RadioButton android:id="@+id/rbFuelM"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="M"
+                    android:textSize="12sp" android:checked="true"
+                    android:layout_marginEnd="2dp" />
+                <RadioButton android:id="@+id/rbFuelL"  android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="L"
+                    android:textSize="12sp" android:layout_marginEnd="2dp" />
+                <RadioButton android:id="@+id/rbFuelXL" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="XL"
+                    android:textSize="12sp" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- Placeholder справа чтобы выровнять под кнопку удалить -->
+        <View android:layout_width="40dp" android:layout_height="1dp" />
+    </LinearLayout>
 
 </LinearLayout>
