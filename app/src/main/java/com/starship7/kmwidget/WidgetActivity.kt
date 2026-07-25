@@ -3,64 +3,60 @@ package com.starship7.kmwidget
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 
 class WidgetActivity : Activity() {
 
+    private lateinit var linesContainer: LinearLayout
+    private val lineViews = mutableListOf<android.view.View>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_widget)
 
-        // ── Загружаем сохранённые настройки ─────────────────────────────
-        val config = WidgetPreferences.load(this, WidgetPreferences.DEFAULT_WIDGET_ID)
-        val display = OverlaySettings.loadDisplay(this)
+        linesContainer = findViewById(R.id.linesContainer)
+
+        // ── Загружаем настройки ──────────────────────────────────────────
+        val config     = WidgetPreferences.load(this, WidgetPreferences.DEFAULT_WIDGET_ID)
+        val rangeSize  = OverlaySettings.getRangeSize(this)
+        val savedLines = OverlaySettings.loadLines(this)
 
         // Окно расчёта
         val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
         val editValue  = findViewById<EditText>(R.id.editValue)
-        if (config.isTimeBased) {
-            radioGroup.check(R.id.radioTime)
-            editValue.setText(config.timeValue.toString())
-        } else {
-            radioGroup.check(R.id.radioKm)
-            editValue.setText(config.kmValue.toString())
+        radioGroup.check(if (config.isTimeBased) R.id.radioTime else R.id.radioKm)
+        editValue.setText(if (config.isTimeBased) config.timeValue.toString() else config.kmValue.toString())
+
+        // Размер строки "Запас хода"
+        val rgRange = findViewById<RadioGroup>(R.id.rgRangeSize)
+        rgRange.check(rangeSizeToRadioId(rangeSize))
+
+        // Загрузить сохранённые доп. строки
+        for (line in savedLines) addLineRow(line)
+
+        // ── Кнопка + Добавить ────────────────────────────────────────────
+        findViewById<Button>(R.id.btnAddLine).setOnClickListener {
+            addLineRow(OverlayLine())   // новая строка с дефолтными значениями
         }
 
-        // Настройки отображения: 3 строки
-        val rgTotal     = findViewById<RadioGroup>(R.id.rgTotal)
-        val rgBreakdown = findViewById<RadioGroup>(R.id.rgBreakdown)
-        val rgInfo      = findViewById<RadioGroup>(R.id.rgInfo)
-
-        rgTotal.check(spToRadioId(rgTotal, display.totalSizeSp))
-        rgBreakdown.check(spToRadioId(rgBreakdown, display.breakdownSizeSp))
-        rgInfo.check(spToRadioId(rgInfo, display.infoSizeSp))
-
-        // ── Сохранить ───────────────────────────────────────────────────
+        // ── Сохранить и применить ────────────────────────────────────────
         findViewById<Button>(R.id.btnSave).setOnClickListener {
-            val isTimeBased = radioGroup.checkedRadioButtonId == R.id.radioTime
-            val value = editValue.text.toString().toFloatOrNull() ?: 30f
-            WidgetPreferences.save(
-                this, WidgetPreferences.DEFAULT_WIDGET_ID,
-                WidgetConfig(isTimeBased, value.toInt(), value)
-            )
-
-            val newDisplay = OverlayDisplayConfig(
-                totalSizeSp     = radioToSp(rgTotal.checkedRadioButtonId),
-                breakdownSizeSp = radioToSp(rgBreakdown.checkedRadioButtonId),
-                infoSizeSp      = radioToSp(rgInfo.checkedRadioButtonId)
-            )
-            OverlaySettings.saveDisplay(this, newDisplay)
-
-            // Перезапустить оверлей чтобы применить новые настройки
-            restartOverlay()
+            saveAll(radioGroup, editValue, rgRange)
             refreshPreview()
         }
 
-        // ── Авто-запуск оверлея при открытии приложения ─────────────────
-        ensureOverlayRunning()
+        // ── Авто-запуск оверлея ──────────────────────────────────────────
+        startForegroundService(Intent(this, OverlayService::class.java).apply {
+            action = OverlayService.ACTION_START
+        })
 
         refreshPreview()
     }
@@ -70,76 +66,95 @@ class WidgetActivity : Activity() {
         refreshPreview()
     }
 
-    /** Запустить оверлей если ещё не запущен */
-    private fun ensureOverlayRunning() {
-        startForegroundService(Intent(this, OverlayService::class.java).apply {
-            action = OverlayService.ACTION_START
-        })
+    // ── Добавить строку в список ─────────────────────────────────────────
+    private fun addLineRow(line: OverlayLine) {
+        val rowView = LayoutInflater.from(this).inflate(R.layout.line_item, linesContainer, false)
+
+        // Установить начальные значения
+        rowView.findViewById<RadioGroup>(R.id.rgType).check(
+            if (line.type == OverlayLineType.BATTERY) R.id.rbBattery else R.id.rbFuel
+        )
+        rowView.findViewById<RadioGroup>(R.id.rgDisplay).check(
+            if (line.display == OverlayLineDisplay.KM) R.id.rbKm else R.id.rbPct
+        )
+        rowView.findViewById<RadioGroup>(R.id.rgSize).check(lineSizeToRadioId(line.sizeSp))
+
+        // Удалить строку
+        rowView.findViewById<Button>(R.id.btnDeleteLine).setOnClickListener {
+            lineViews.remove(rowView)
+            linesContainer.removeView(rowView)
+        }
+
+        lineViews.add(rowView)
+        linesContainer.addView(rowView)
     }
 
-    /** Остановить и перезапустить оверлей (после изменения настроек) */
-    private fun restartOverlay() {
-        startService(Intent(this, OverlayService::class.java).apply {
-            action = OverlayService.ACTION_STOP
-        })
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+    // ── Читать состояние всех строк ──────────────────────────────────────
+    private fun readLines(): List<OverlayLine> = lineViews.map { row ->
+        val type = if (row.findViewById<RadioButton>(R.id.rbBattery).isChecked)
+            OverlayLineType.BATTERY else OverlayLineType.FUEL
+
+        val display = if (row.findViewById<RadioButton>(R.id.rbKm).isChecked)
+            OverlayLineDisplay.KM else OverlayLineDisplay.PERCENT
+
+        val sizeSp = when {
+            row.findViewById<RadioButton>(R.id.rbS ).isChecked -> OverlayLine.LINE_SIZE_S
+            row.findViewById<RadioButton>(R.id.rbL ).isChecked -> OverlayLine.LINE_SIZE_L
+            row.findViewById<RadioButton>(R.id.rbXL).isChecked -> OverlayLine.LINE_SIZE_XL
+            else                                               -> OverlayLine.LINE_SIZE_M
+        }
+        OverlayLine(type, display, sizeSp)
+    }
+
+    // ── Сохранить всё и перезапустить оверлей ───────────────────────────
+    private fun saveAll(radioGroup: RadioGroup, editValue: EditText, rgRange: RadioGroup) {
+        // Окно расчёта
+        val isTimeBased = radioGroup.checkedRadioButtonId == R.id.radioTime
+        val value = editValue.text.toString().toFloatOrNull() ?: 30f
+        WidgetPreferences.save(this, WidgetPreferences.DEFAULT_WIDGET_ID,
+            WidgetConfig(isTimeBased, value.toInt(), value))
+
+        // Размер "Запас хода"
+        OverlaySettings.saveRangeSize(this, radioToRangeSize(rgRange.checkedRadioButtonId))
+
+        // Дополнительные строки
+        OverlaySettings.saveLines(this, readLines())
+
+        // Перезапустить оверлей
+        startService(Intent(this, OverlayService::class.java).apply { action = OverlayService.ACTION_STOP })
+        Handler(Looper.getMainLooper()).postDelayed({
             startForegroundService(Intent(this, OverlayService::class.java).apply {
                 action = OverlayService.ACTION_START
             })
-        }, 500)
+        }, 600)
     }
 
     private fun refreshPreview() {
-        val result = RangeCalculator.calculate(this, WidgetPreferences.DEFAULT_WIDGET_ID)
-        findViewById<TextView>(R.id.textRange).text = result.totalText
-        findViewById<TextView>(R.id.textInfo).text  = result.breakdownText + "  " + result.infoText
+        val r = RangeCalculator.calculate(this, WidgetPreferences.DEFAULT_WIDGET_ID)
+        findViewById<TextView>(R.id.textRange).text = r.totalText
+        findViewById<TextView>(R.id.textInfo) .text = r.breakdownText
     }
 
-    // ── Маппинг RadioGroup ID ↔ sp ────────────────────────────────────
+    // ── Маппинг ID ↔ размер ───────────────────────────────────────────────
 
-    private fun radioToSp(radioId: Int): Int = when (radioId) {
-        R.id.rgTotalOff,  R.id.rgBdOff,  R.id.rgInfoOff  -> OverlayDisplayConfig.SIZE_OFF
-        R.id.rgTotalS,    R.id.rgBdS,    R.id.rgInfoS    -> OverlayDisplayConfig.SIZE_S
-        R.id.rgTotalM,    R.id.rgBdM,    R.id.rgInfoM    -> OverlayDisplayConfig.SIZE_M
-        R.id.rgTotalL,    R.id.rgBdL,    R.id.rgInfoL    -> OverlayDisplayConfig.SIZE_L
-        R.id.rgTotalXL,   R.id.rgBdXL,  R.id.rgInfoXL   -> OverlayDisplayConfig.SIZE_XL
-        else -> OverlayDisplayConfig.SIZE_M
+    private fun rangeSizeToRadioId(sp: Int): Int = when (sp) {
+        OverlayLine.RANGE_SIZE_S  -> R.id.rgRangeS
+        OverlayLine.RANGE_SIZE_L  -> R.id.rgRangeL
+        OverlayLine.RANGE_SIZE_XL -> R.id.rgRangeXL
+        else                      -> R.id.rgRangeM
     }
 
-    /** Выбрать RadioButton в группе, соответствующий заданному размеру sp. */
-    private fun spToRadioId(group: RadioGroup, sp: Int): Int {
-        val offId = when (group.id) {
-            R.id.rgTotal     -> R.id.rgTotalOff
-            R.id.rgBreakdown -> R.id.rgBdOff
-            else             -> R.id.rgInfoOff
-        }
-        val sId = when (group.id) {
-            R.id.rgTotal     -> R.id.rgTotalS
-            R.id.rgBreakdown -> R.id.rgBdS
-            else             -> R.id.rgInfoS
-        }
-        val mId = when (group.id) {
-            R.id.rgTotal     -> R.id.rgTotalM
-            R.id.rgBreakdown -> R.id.rgBdM
-            else             -> R.id.rgInfoM
-        }
-        val lId = when (group.id) {
-            R.id.rgTotal     -> R.id.rgTotalL
-            R.id.rgBreakdown -> R.id.rgBdL
-            else             -> R.id.rgInfoL
-        }
-        val xlId = when (group.id) {
-            R.id.rgTotal     -> R.id.rgTotalXL
-            R.id.rgBreakdown -> R.id.rgBdXL
-            else             -> R.id.rgInfoXL
-        }
-        return when (sp) {
-            OverlayDisplayConfig.SIZE_OFF -> offId
-            OverlayDisplayConfig.SIZE_S   -> sId
-            OverlayDisplayConfig.SIZE_M   -> mId
-            OverlayDisplayConfig.SIZE_L   -> lId
-            OverlayDisplayConfig.SIZE_XL  -> xlId
-            else -> mId
-        }
+    private fun radioToRangeSize(id: Int): Int = when (id) {
+        R.id.rgRangeS  -> OverlayLine.RANGE_SIZE_S
+        R.id.rgRangeL  -> OverlayLine.RANGE_SIZE_L
+        R.id.rgRangeXL -> OverlayLine.RANGE_SIZE_XL
+        else            -> OverlayLine.RANGE_SIZE_M
+    }
+
+    private fun lineSizeToRadioId(sp: Int): Int = when (sp) {
+        OverlayLine.LINE_SIZE_S  -> R.id.rbS
+        OverlayLine.LINE_SIZE_L  -> R.id.rbL
+        OverlayLine.LINE_SIZE_XL -> R.id.rbXL
+        else                     -> R.id.rbM
     }
 }

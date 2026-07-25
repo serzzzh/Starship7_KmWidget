@@ -14,36 +14,36 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="22sp"
+            android:text="Запас хода — настройки"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="16dp" />
 
         <!-- Превью -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#22000000"
+            android:background="#1A00FF00"
             android:padding="14dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/widget_preview_title"
-                android:textSize="12sp"
+                android:text="Текущая оценка"
+                android:textSize="11sp"
                 android:textColor="#888888" />
 
             <TextView
                 android:id="@+id/textRange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="-- km"
-                android:textColor="#00AA00"
+                android:text="-- км"
+                android:textColor="#00AA44"
                 android:textSize="32sp"
                 android:textStyle="bold"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="4dp" />
 
             <TextView
                 android:id="@+id/textInfo"
@@ -54,33 +54,98 @@
                 android:layout_marginTop="2dp" />
         </LinearLayout>
 
-        <!-- ══ Окно расчёта ════════════════════════════════════════════ -->
+        <!-- ══ Строка «Запас хода» ════════════════════════════════════ -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/widget_config_title"
+            android:text="Запас хода — размер"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="6dp" />
+
+        <RadioGroup
+            android:id="@+id/rgRangeSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+            <RadioButton android:id="@+id/rgRangeS"  android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="S" android:gravity="center" />
+            <RadioButton android:id="@+id/rgRangeM"  android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="M" android:gravity="center" android:checked="true" />
+            <RadioButton android:id="@+id/rgRangeL"  android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="L" android:gravity="center" />
+            <RadioButton android:id="@+id/rgRangeXL" android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="XL" android:gravity="center" />
+        </RadioGroup>
+
+        <!-- ══ Дополнительные строки ═════════════════════════════════ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Дополнительные строки"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnAddLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+ Добавить"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Легенда -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp"
+            android:layout_marginBottom="4dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Источник" android:textSize="11sp" android:textColor="#888888"
+                android:layout_marginEnd="16dp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Стиль" android:textSize="11sp" android:textColor="#888888"
+                android:layout_marginEnd="16dp" />
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="Размер" android:textSize="11sp" android:textColor="#888888" />
+        </LinearLayout>
+
+        <!-- Контейнер для динамических строк -->
+        <LinearLayout
+            android:id="@+id/linesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="20dp" />
+
+        <!-- ══ Окно расчёта ══════════════════════════════════════════ -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Окно расчёта"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp" />
 
         <RadioGroup
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radioTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/widget_config_time"
-                android:checked="true" />
-
-            <RadioButton
-                android:id="@+id/radioKm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/widget_config_km"
+            <RadioButton android:id="@+id/radioTime" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="Последние N минут" android:checked="true" />
+            <RadioButton android:id="@+id/radioKm" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="Последние X км"
                 android:layout_marginStart="16dp" />
         </RadioGroup>
 
@@ -88,119 +153,18 @@
             android:id="@+id/editValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/widget_config_hint"
+            android:hint="Значение (минуты или км)"
             android:inputType="numberDecimal"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="20dp" />
 
-        <!-- ══ Настройки отображения оверлея ══════════════════════════ -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/overlay_display_title"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="10dp" />
-
-        <!-- Строка 1: Общий запас хода -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/overlay_line_total"
-            android:textSize="13sp"
-            android:layout_marginBottom="4dp" />
-
-        <RadioGroup
-            android:id="@+id/rgTotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-            <RadioButton android:id="@+id/rgTotalOff" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="@string/size_off" />
-            <RadioButton android:id="@+id/rgTotalS" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="S" />
-            <RadioButton android:id="@+id/rgTotalM" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="M" />
-            <RadioButton android:id="@+id/rgTotalL" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="L" android:checked="true" />
-            <RadioButton android:id="@+id/rgTotalXL" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="XL" />
-        </RadioGroup>
-
-        <!-- Строка 2: EV + Fuel в км -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/overlay_line_breakdown"
-            android:textSize="13sp"
-            android:layout_marginBottom="4dp" />
-
-        <RadioGroup
-            android:id="@+id/rgBreakdown"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-            <RadioButton android:id="@+id/rgBdOff" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="@string/size_off" />
-            <RadioButton android:id="@+id/rgBdS" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="S" />
-            <RadioButton android:id="@+id/rgBdM" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="M" android:checked="true" />
-            <RadioButton android:id="@+id/rgBdL" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="L" />
-            <RadioButton android:id="@+id/rgBdXL" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="XL" />
-        </RadioGroup>
-
-        <!-- Строка 3: % заряда и топлива -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/overlay_line_info"
-            android:textSize="13sp"
-            android:layout_marginBottom="4dp" />
-
-        <RadioGroup
-            android:id="@+id/rgInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="20dp">
-            <RadioButton android:id="@+id/rgInfoOff" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="@string/size_off" />
-            <RadioButton android:id="@+id/rgInfoS" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="S" android:checked="true" />
-            <RadioButton android:id="@+id/rgInfoM" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="M" />
-            <RadioButton android:id="@+id/rgInfoL" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="L" />
-            <RadioButton android:id="@+id/rgInfoXL" android:layout_width="0dp"
-                android:layout_height="wrap_content" android:layout_weight="1"
-                android:text="XL" />
-        </RadioGroup>
-
-        <!-- Кнопка Сохранить -->
+        <!-- Сохранить -->
         <Button
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/btn_save_settings" />
+            android:text="✓  Сохранить и применить"
+            android:textSize="15sp" />
 
     </LinearLayout>
 </ScrollView>

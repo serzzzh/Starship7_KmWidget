@@ -6,18 +6,19 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.view.GestureDetector
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.starship7.kmwidget.car.VehiclePropertyHelper
 import com.starship7.kmwidget.tools.PropertyConstants
@@ -47,11 +48,8 @@ class OverlayService : Service() {
         }
     }
 
-    // Drag state
-    private var dragInitialX = 0
-    private var dragInitialY = 0
-    private var dragTouchX   = 0f
-    private var dragTouchY   = 0f
+    private var dragInitialX = 0; private var dragInitialY = 0
+    private var dragTouchX   = 0f; private var dragTouchY   = 0f
     private var isDragging   = false
 
     override fun onCreate() {
@@ -64,19 +62,18 @@ class OverlayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
+        return when (intent?.action) {
             ACTION_STOP -> {
                 OverlaySettings.setEnabled(this, false)
-                removeOverlay()
-                stopSelf()
-                return START_NOT_STICKY
+                removeOverlay(); stopSelf()
+                START_NOT_STICKY
             }
             else -> {
                 OverlaySettings.setEnabled(this, true)
                 showOverlay()
+                START_STICKY
             }
         }
-        return START_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -90,8 +87,7 @@ class OverlayService : Service() {
     // ── Показать оверлей ────────────────────────────────────────────────
     private fun showOverlay() {
         if (overlayView != null) return
-
-        val (savedX, savedY) = OverlaySettings.getPosition(this)
+        val (x, y) = OverlaySettings.getPosition(this)
 
         params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -103,96 +99,56 @@ class OverlayService : Service() {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
-            x = savedX
-            y = savedY
+            this.x = x; this.y = y
         }
 
         val view = LayoutInflater.from(this).inflate(R.layout.overlay_range, null)
 
-        // Кнопка выключения (top-right)
+        // Кнопка выключения
         view.findViewById<TextView>(R.id.overlay_power_btn).setOnClickListener {
-            Log.i(TAG, "Power button pressed — stopping overlay")
             OverlaySettings.setEnabled(this, false)
-            removeOverlay()
-            stopSelf()
+            removeOverlay(); stopSelf()
         }
 
         setupDrag(view)
-        applyDisplayConfig(view)
-
         overlayView = view
         windowManager.addView(view, params)
         handler.post(updateRunnable)
     }
 
-    // ── Drag (игнорируем зону power-кнопки) ────────────────────────────
+    // ── Drag (исключает зону power-кнопки) ─────────────────────────────
     private fun setupDrag(view: View) {
         view.setOnTouchListener { v, event ->
-            // Если касание попало на power-кнопку — не начинаем drag
             val powerBtn = view.findViewById<TextView>(R.id.overlay_power_btn)
             val btnBounds = Rect()
             powerBtn.getHitRect(btnBounds)
             if (event.action == MotionEvent.ACTION_DOWN &&
-                btnBounds.contains(event.x.toInt(), event.y.toInt())) {
+                btnBounds.contains(event.x.toInt(), event.y.toInt()))
                 return@setOnTouchListener false
-            }
 
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    dragInitialX = params.x
-                    dragInitialY = params.y
-                    dragTouchX   = event.rawX
-                    dragTouchY   = event.rawY
-                    isDragging   = false
-                    true
+                    dragInitialX = params.x; dragInitialY = params.y
+                    dragTouchX = event.rawX; dragTouchY = event.rawY
+                    isDragging = false; true
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val dx = (event.rawX - dragTouchX).toInt()
                     val dy = (event.rawY - dragTouchY).toInt()
                     if (!isDragging && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) isDragging = true
                     if (isDragging) {
-                        params.x = dragInitialX + dx
-                        params.y = dragInitialY + dy
+                        params.x = dragInitialX + dx; params.y = dragInitialY + dy
                         try { windowManager.updateViewLayout(v, params) } catch (_: Exception) {}
                     }
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (isDragging) {
-                        OverlaySettings.savePosition(this, params.x, params.y)
-                    }
-                    isDragging = false
-                    true
+                    if (isDragging) OverlaySettings.savePosition(this, params.x, params.y)
+                    isDragging = false; true
                 }
                 else -> false
             }
         }
-    }
-
-    // ── Применить настройки отображения ────────────────────────────────
-    private fun applyDisplayConfig(view: View) {
-        val cfg = OverlaySettings.loadDisplay(this)
-
-        fun applyLine(id: Int, sizeSp: Int) {
-            val tv = view.findViewById<TextView>(id)
-            if (sizeSp == OverlayDisplayConfig.SIZE_OFF) {
-                tv.visibility = View.GONE
-            } else {
-                tv.visibility = View.VISIBLE
-                tv.textSize = sizeSp.toFloat()
-            }
-        }
-
-        applyLine(R.id.overlay_range,     cfg.totalSizeSp)
-        applyLine(R.id.overlay_breakdown, cfg.breakdownSizeSp)
-        applyLine(R.id.overlay_info,      cfg.infoSizeSp)
-
-        // Заголовок — показываем только если хоть одна строка видна
-        val titleVisible = cfg.totalSizeSp != OverlayDisplayConfig.SIZE_OFF ||
-                cfg.breakdownSizeSp != OverlayDisplayConfig.SIZE_OFF ||
-                cfg.infoSizeSp != OverlayDisplayConfig.SIZE_OFF
-        view.findViewById<TextView>(R.id.overlay_title).visibility =
-            if (titleVisible) View.VISIBLE else View.GONE
     }
 
     // ── Обновление данных ───────────────────────────────────────────────
@@ -203,24 +159,57 @@ class OverlayService : Service() {
 
         val result = RangeCalculator.calculateWithHelper(this, WidgetPreferences.DEFAULT_WIDGET_ID, db, vh)
 
+        // Собираем точку истории
         if (vh.isConnected) {
             val odo  = vh.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
             val bat  = vh.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
             val fuel = vh.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 0).toFloat()
-            Log.i(TAG, "Collected: ODO=$odo BAT=$bat% FUEL=$fuel% → ${result.totalText}")
+            Log.i(TAG, "ODO=$odo BAT=$bat% FUEL=$fuel% → ${result.totalText}")
             if (odo > 0) db.insertLog(System.currentTimeMillis(), odo, bat, fuel)
-        } else {
-            Log.w(TAG, "Car API not connected")
         }
 
-        view.findViewById<TextView>(R.id.overlay_range)    .text = result.totalText
-        view.findViewById<TextView>(R.id.overlay_breakdown).text = result.breakdownText
-        view.findViewById<TextView>(R.id.overlay_info)     .text = result.infoText
+        // Главная строка: размер из настроек
+        val rangeView = view.findViewById<TextView>(R.id.overlay_range)
+        rangeView.text     = result.totalText
+        rangeView.textSize = OverlaySettings.getRangeSize(this).toFloat()
+
+        // Дополнительные строки — рендерим заново
+        val container = view.findViewById<LinearLayout>(R.id.overlay_lines)
+        renderLines(container, result.snapshot)
     }
 
-    // Вызывается из WidgetActivity после изменения настроек дисплея
-    fun refreshDisplayConfig() {
-        overlayView?.let { applyDisplayConfig(it) }
+    private fun renderLines(container: LinearLayout, snapshot: CarSnapshot) {
+        container.removeAllViews()
+        if (!snapshot.isConnected) return
+
+        val lines = OverlaySettings.loadLines(this)
+        for (line in lines) {
+            val text = formatLine(line, snapshot) ?: continue
+            val tv = TextView(this).apply {
+                this.text = text
+                textSize  = line.sizeSp.toFloat()
+                setTextColor(Color.parseColor("#CCCCCC"))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 1 }
+            }
+            container.addView(tv)
+        }
+    }
+
+    private fun formatLine(line: OverlayLine, s: CarSnapshot): String? {
+        return when {
+            line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.KM ->
+                if (s.evRangeKm > 0) "🔋 ${s.evRangeKm.toInt()} км" else null
+            line.type == OverlayLineType.BATTERY && line.display == OverlayLineDisplay.PERCENT ->
+                if (s.batteryPct >= 0) "🔋 ${s.batteryPct.toInt()}%" else null
+            line.type == OverlayLineType.FUEL && line.display == OverlayLineDisplay.KM ->
+                if (s.fuelRangeKm > 0) "⛽ ${s.fuelRangeKm.toInt()} км" else null
+            line.type == OverlayLineType.FUEL && line.display == OverlayLineDisplay.PERCENT ->
+                if (s.fuelPct >= 0) "⛽ ${s.fuelPct.toInt()}%" else null
+            else -> null
+        }
     }
 
     private fun removeOverlay() {
@@ -232,12 +221,12 @@ class OverlayService : Service() {
     }
 
     private fun buildNotification() = Notification.Builder(this, "overlay_channel")
-        .setContentTitle("Range Overlay")
-        .setContentText("Running • tap ⏻ on overlay to stop")
+        .setContentTitle("Запас хода")
+        .setContentText("Нажмите ⏻ на оверлее чтобы выключить")
         .build()
 
     private fun createNotificationChannel() {
-        val ch = NotificationChannel("overlay_channel", "Range Overlay", NotificationManager.IMPORTANCE_LOW)
+        val ch = NotificationChannel("overlay_channel", "Запас хода", NotificationManager.IMPORTANCE_LOW)
         getSystemService(NotificationManager::class.java)?.createNotificationChannel(ch)
     }
 }

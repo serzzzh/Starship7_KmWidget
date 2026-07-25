@@ -11,8 +11,8 @@ object WidgetPreferences {
         val prefs = context.getSharedPreferences(prefsName(widgetId), Context.MODE_PRIVATE)
         return WidgetConfig(
             isTimeBased = prefs.getBoolean("isTimeBased", true),
-            timeValue = prefs.getInt("timeValue", 30),
-            kmValue = prefs.getFloat("kmValue", 50f)
+            timeValue   = prefs.getInt("timeValue", 30),
+            kmValue     = prefs.getFloat("kmValue", 50f)
         )
     }
 
@@ -31,56 +31,71 @@ data class WidgetConfig(
     val kmValue: Float
 )
 
-// ── Настройки отображения оверлея ──────────────────────────────────────────
-
-/** Размер текста в sp. 0 = скрыть строку. */
-data class OverlayDisplayConfig(
-    val totalSizeSp: Int    = SIZE_L,    // Общий запас хода
-    val breakdownSizeSp: Int = SIZE_M,  // EV + Fuel в км
-    val infoSizeSp: Int     = SIZE_S    // % заряда и топлива
-) {
-    companion object {
-        const val SIZE_OFF = 0
-        const val SIZE_S   = 14
-        const val SIZE_M   = 20
-        const val SIZE_L   = 28
-        const val SIZE_XL  = 38
-    }
-}
+// ── Настройки оверлея ──────────────────────────────────────────────────────
 
 object OverlaySettings {
     private const val PREFS = "overlay_prefs"
 
-    fun loadDisplay(ctx: Context): OverlayDisplayConfig {
-        val p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        return OverlayDisplayConfig(
-            totalSizeSp    = p.getInt("size_total",     OverlayDisplayConfig.SIZE_L),
-            breakdownSizeSp = p.getInt("size_breakdown", OverlayDisplayConfig.SIZE_M),
-            infoSizeSp     = p.getInt("size_info",      OverlayDisplayConfig.SIZE_S)
-        )
-    }
-
-    fun saveDisplay(ctx: Context, cfg: OverlayDisplayConfig) {
-        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-            .putInt("size_total",     cfg.totalSizeSp)
-            .putInt("size_breakdown", cfg.breakdownSizeSp)
-            .putInt("size_info",      cfg.infoSizeSp)
-            .apply()
-    }
-
+    // ── Позиция ──────────────────────────────────────────────────────────
     fun getPosition(ctx: Context): Pair<Int, Int> {
         val p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         return Pair(p.getInt("x", 20), p.getInt("y", 100))
     }
-
-    fun savePosition(ctx: Context, x: Int, y: Int) {
+    fun savePosition(ctx: Context, x: Int, y: Int) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putInt("x", x).putInt("y", y).apply()
-    }
 
+    // ── Включён ──────────────────────────────────────────────────────────
     fun isEnabled(ctx: Context) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean("enabled", false)
-
     fun setEnabled(ctx: Context, v: Boolean) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean("enabled", v).apply()
+
+    // ── Размер строки "Запас хода" ────────────────────────────────────────
+    fun getRangeSize(ctx: Context): Int =
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt("range_size", OverlayLine.RANGE_SIZE_M)
+    fun saveRangeSize(ctx: Context, sp: Int) =
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putInt("range_size", sp).apply()
+
+    // ── Дополнительные строки ─────────────────────────────────────────────
+    fun loadLines(ctx: Context): List<OverlayLine> {
+        val p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val count = p.getInt("line_count", 0)
+        return (0 until count).mapNotNull { i ->
+            try {
+                OverlayLine(
+                    type    = OverlayLineType.valueOf(p.getString("line_${i}_type", "BATTERY")!!),
+                    display = OverlayLineDisplay.valueOf(p.getString("line_${i}_display", "KM")!!),
+                    sizeSp  = p.getInt("line_${i}_size", OverlayLine.LINE_SIZE_M)
+                )
+            } catch (_: Exception) { null }
+        }
+    }
+
+    fun saveLines(ctx: Context, lines: List<OverlayLine>) {
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().apply {
+            putInt("line_count", lines.size)
+            lines.forEachIndexed { i, line ->
+                putString("line_${i}_type",    line.type.name)
+                putString("line_${i}_display", line.display.name)
+                putInt("line_${i}_size",       line.sizeSp)
+            }
+            apply()
+        }
+    }
+}
+
+// ── Legacy (used by old code paths only) ──────────────────────────────────
+data class OverlayDisplayConfig(
+    val totalSizeSp: Int     = OverlayLine.RANGE_SIZE_M,
+    val breakdownSizeSp: Int = OverlayLine.LINE_SIZE_M,
+    val infoSizeSp: Int      = OverlayLine.LINE_SIZE_S
+) {
+    companion object {
+        const val SIZE_OFF = 0
+        const val SIZE_S   = OverlayLine.LINE_SIZE_S
+        const val SIZE_M   = OverlayLine.LINE_SIZE_M
+        const val SIZE_L   = OverlayLine.LINE_SIZE_L
+        const val SIZE_XL  = OverlayLine.LINE_SIZE_XL
+    }
 }

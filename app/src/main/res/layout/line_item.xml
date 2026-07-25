@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Одна настраиваемая строка оверлея -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="4dp"
+    android:background="#11FFFFFF"
+    android:layout_marginBottom="4dp">
+
+    <!-- Тип: 🔋 / ⛽ -->
+    <RadioGroup
+        android:id="@+id/rgType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginEnd="8dp">
+        <RadioButton
+            android:id="@+id/rbBattery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔋"
+            android:textSize="18sp"
+            android:checked="true"
+            android:button="@null"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp"
+            android:background="@android:drawable/btn_radio" />
+        <RadioButton
+            android:id="@+id/rbFuel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⛽"
+            android:textSize="18sp"
+            android:button="@null"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp"
+            android:background="@android:drawable/btn_radio" />
+    </RadioGroup>
+
+    <!-- Отображение: км / % -->
+    <RadioGroup
+        android:id="@+id/rgDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginEnd="8dp">
+        <RadioButton
+            android:id="@+id/rbKm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="км"
+            android:textSize="14sp"
+            android:checked="true"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="6dp" />
+        <RadioButton
+            android:id="@+id/rbPct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textSize="14sp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="6dp" />
+    </RadioGroup>
+
+    <!-- Размер: S / M / L / XL -->
+    <RadioGroup
+        android:id="@+id/rgSize"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <RadioButton android:id="@+id/rbS"  android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="S"  android:textSize="13sp" android:gravity="center" />
+        <RadioButton android:id="@+id/rbM"  android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="M"  android:textSize="13sp" android:gravity="center" android:checked="true" />
+        <RadioButton android:id="@+id/rbL"  android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="L"  android:textSize="13sp" android:gravity="center" />
+        <RadioButton android:id="@+id/rbXL" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="XL" android:textSize="13sp" android:gravity="center" />
+    </RadioGroup>
+
+    <!-- Удалить -->
+    <Button
+        android:id="@+id/btnDeleteLine"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:text="✕"
+        android:textSize="14sp"
+        android:padding="0dp"
+        android:layout_marginStart="6dp"
+        android:backgroundTint="#AA444444" />
+
+</LinearLayout>

@@ -1,32 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Range Widget</string>
-    <string name="widget_activity_title">Range Widget Settings</string>
-    <string name="widget_preview_title">Current estimate</string>
-    <string name="widget_config_title">Calculation window</string>
-    <string name="widget_config_time">Last N minutes</string>
-    <string name="widget_config_km">Last X km</string>
-    <string name="widget_config_hint">Value (minutes or km)</string>
-    <string name="widget_shortcut_name">Range Widget</string>
+    <string name="app_name">Запас хода</string>
+    <string name="widget_preview_title">Текущая оценка</string>
+    <string name="widget_config_title">Окно расчёта</string>
+    <string name="widget_config_time">Последние N минут</string>
+    <string name="widget_config_km">Последние X км</string>
+    <string name="widget_config_hint">Значение (минуты или км)</string>
+    <string name="widget_shortcut_name">Запас хода</string>
     <string name="widget_status_loading">…</string>
-    <string name="widget_status_none">No widget on home screen.</string>
-    <string name="widget_status_count">Widgets: %1$d</string>
-    <string name="widget_add_to_home">Open widget gallery</string>
-    <string name="widget_refresh">Refresh data</string>
-    <string name="widget_flyme_hint">Select Range Widget in the gallery.</string>
-    <string name="widget_bind_failed">Could not open widget gallery.</string>
-    <string name="widget_picker_opened">Widget gallery opened.</string>
-
-    <!-- Overlay display settings -->
-    <string name="overlay_display_title">Overlay display</string>
-    <string name="overlay_line_total">Total range</string>
-    <string name="overlay_line_breakdown">EV + Fuel (km)</string>
-    <string name="overlay_line_info">Battery + Fuel (%)</string>
-    <string name="size_off">Off</string>
-    <string name="btn_save_settings">Save &amp; apply</string>
-
-    <!-- Legacy (keep for BootReceiver / other references) -->
-    <string name="overlay_enable">Enable overlay</string>
-    <string name="overlay_disable">Disable overlay</string>
-    <string name="overlay_hint">Drag to move. Tap ⏻ to hide.</string>
+    <string name="widget_status_none">Нет виджета на экране.</string>
+    <string name="widget_status_count">Виджетов: %1$d</string>
+    <string name="widget_add_to_home">Открыть галерею виджетов</string>
+    <string name="widget_refresh">Обновить</string>
+    <string name="widget_flyme_hint">Выберите виджет «Запас хода» в галерее.</string>
+    <string name="widget_bind_failed">Галерея виджетов недоступна.</string>
+    <string name="widget_picker_opened">Галерея открыта.</string>
+    <string name="overlay_enable">Включить оверлей</string>
+    <string name="overlay_disable">Выключить оверлей</string>
+    <string name="overlay_hint">Перетащите для перемещения. Нажмите ⏻ для выключения.</string>
+    <string name="overlay_display_title">Настройки отображения</string>
+    <string name="overlay_line_total">Запас хода</string>
+    <string name="overlay_line_breakdown">EV + топливо (км)</string>
+    <string name="overlay_line_info">Батарея + топливо (%)</string>
+    <string name="size_off">Выкл</string>
+    <string name="btn_save_settings">✓  Сохранить и применить</string>
 </resources>
