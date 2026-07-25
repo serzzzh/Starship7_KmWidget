@@ -1,33 +1,26 @@
 package com.starship7.kmwidget
 
 import android.app.Activity
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 
 class WidgetActivity : Activity() {
-
-    private var shortcutMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_widget)
 
-        shortcutMode = intent.action == Intent.ACTION_CREATE_SHORTCUT
-
-        val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
-        val editValue = findViewById<EditText>(R.id.editValue)
-        val btnAddWidget = findViewById<Button>(R.id.btnAddWidget)
-        val btnRefresh = findViewById<Button>(R.id.btnRefresh)
-        val btnOverlay = findViewById<Button>(R.id.btnOverlay)
-
+        // ── Загружаем сохранённые настройки ─────────────────────────────
         val config = WidgetPreferences.load(this, WidgetPreferences.DEFAULT_WIDGET_ID)
+        val display = OverlaySettings.loadDisplay(this)
+
+        // Окно расчёта
+        val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+        val editValue  = findViewById<EditText>(R.id.editValue)
         if (config.isTimeBased) {
             radioGroup.check(R.id.radioTime)
             editValue.setText(config.timeValue.toString())
@@ -36,128 +29,117 @@ class WidgetActivity : Activity() {
             editValue.setText(config.kmValue.toString())
         }
 
-        btnAddWidget.setOnClickListener {
-            saveDefaultConfig(radioGroup, editValue)
-            if (shortcutMode) {
-                returnShortcutResult(AppWidgetManager.INVALID_APPWIDGET_ID)
-            } else {
-                openFlymeWidgetPicker()
-            }
-        }
+        // Настройки отображения: 3 строки
+        val rgTotal     = findViewById<RadioGroup>(R.id.rgTotal)
+        val rgBreakdown = findViewById<RadioGroup>(R.id.rgBreakdown)
+        val rgInfo      = findViewById<RadioGroup>(R.id.rgInfo)
 
-        btnRefresh.setOnClickListener {
-            saveDefaultConfig(radioGroup, editValue)
+        rgTotal.check(spToRadioId(rgTotal, display.totalSizeSp))
+        rgBreakdown.check(spToRadioId(rgBreakdown, display.breakdownSizeSp))
+        rgInfo.check(spToRadioId(rgInfo, display.infoSizeSp))
+
+        // ── Сохранить ───────────────────────────────────────────────────
+        findViewById<Button>(R.id.btnSave).setOnClickListener {
+            val isTimeBased = radioGroup.checkedRadioButtonId == R.id.radioTime
+            val value = editValue.text.toString().toFloatOrNull() ?: 30f
+            WidgetPreferences.save(
+                this, WidgetPreferences.DEFAULT_WIDGET_ID,
+                WidgetConfig(isTimeBased, value.toInt(), value)
+            )
+
+            val newDisplay = OverlayDisplayConfig(
+                totalSizeSp     = radioToSp(rgTotal.checkedRadioButtonId),
+                breakdownSizeSp = radioToSp(rgBreakdown.checkedRadioButtonId),
+                infoSizeSp      = radioToSp(rgInfo.checkedRadioButtonId)
+            )
+            OverlaySettings.saveDisplay(this, newDisplay)
+
+            // Перезапустить оверлей чтобы применить новые настройки
+            restartOverlay()
             refreshPreview()
-            updateExistingWidgets()
         }
 
-        btnOverlay.setOnClickListener {
-            toggleOverlay(btnOverlay)
-        }
+        // ── Авто-запуск оверлея при открытии приложения ─────────────────
+        ensureOverlayRunning()
 
-        updateOverlayButton(btnOverlay)
         refreshPreview()
-        updateStatusText()
-    }
-
-    private fun toggleOverlay(btn: Button) {
-        val isEnabled = OverlayService.isEnabled(this)
-        if (isEnabled) {
-            startService(Intent(this, OverlayService::class.java).apply {
-                action = OverlayService.ACTION_STOP
-            })
-            btn.text = getString(R.string.overlay_enable)
-        } else {
-            startForegroundService(Intent(this, OverlayService::class.java).apply {
-                action = OverlayService.ACTION_START
-            })
-            btn.text = getString(R.string.overlay_disable)
-        }
-    }
-
-    private fun updateOverlayButton(btn: Button) {
-        btn.text = if (OverlayService.isEnabled(this)) getString(R.string.overlay_disable)
-                   else getString(R.string.overlay_enable)
     }
 
     override fun onResume() {
         super.onResume()
-        updateStatusText()
+        refreshPreview()
     }
 
-    private fun saveDefaultConfig(radioGroup: RadioGroup, editValue: EditText) {
-        val isTimeBased = radioGroup.checkedRadioButtonId == R.id.radioTime
-        val value = editValue.text.toString().toFloatOrNull() ?: 30f
-        WidgetPreferences.save(
-            this,
-            WidgetPreferences.DEFAULT_WIDGET_ID,
-            WidgetConfig(
-                isTimeBased = isTimeBased,
-                timeValue = value.toInt(),
-                kmValue = value
-            )
-        )
+    /** Запустить оверлей если ещё не запущен */
+    private fun ensureOverlayRunning() {
+        startForegroundService(Intent(this, OverlayService::class.java).apply {
+            action = OverlayService.ACTION_START
+        })
+    }
+
+    /** Остановить и перезапустить оверлей (после изменения настроек) */
+    private fun restartOverlay() {
+        startService(Intent(this, OverlayService::class.java).apply {
+            action = OverlayService.ACTION_STOP
+        })
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            startForegroundService(Intent(this, OverlayService::class.java).apply {
+                action = OverlayService.ACTION_START
+            })
+        }, 500)
     }
 
     private fun refreshPreview() {
         val result = RangeCalculator.calculate(this, WidgetPreferences.DEFAULT_WIDGET_ID)
         findViewById<TextView>(R.id.textRange).text = result.totalText
-        findViewById<TextView>(R.id.textInfo).text = result.infoText
+        findViewById<TextView>(R.id.textInfo).text  = result.breakdownText + "  " + result.infoText
     }
 
-    private fun updateStatusText() {
-        val appWidgetManager = AppWidgetManager.getInstance(this)
-        val componentName = ComponentName(this, RangeWidgetProvider::class.java)
-        val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
-        val statusView = findViewById<TextView>(R.id.textStatus)
-        statusView.text = if (widgetIds.isEmpty()) {
-            getString(R.string.widget_status_none)
-        } else {
-            getString(R.string.widget_status_count, widgetIds.size)
-        }
+    // ── Маппинг RadioGroup ID ↔ sp ────────────────────────────────────
+
+    private fun radioToSp(radioId: Int): Int = when (radioId) {
+        R.id.rgTotalOff,  R.id.rgBdOff,  R.id.rgInfoOff  -> OverlayDisplayConfig.SIZE_OFF
+        R.id.rgTotalS,    R.id.rgBdS,    R.id.rgInfoS    -> OverlayDisplayConfig.SIZE_S
+        R.id.rgTotalM,    R.id.rgBdM,    R.id.rgInfoM    -> OverlayDisplayConfig.SIZE_M
+        R.id.rgTotalL,    R.id.rgBdL,    R.id.rgInfoL    -> OverlayDisplayConfig.SIZE_L
+        R.id.rgTotalXL,   R.id.rgBdXL,  R.id.rgInfoXL   -> OverlayDisplayConfig.SIZE_XL
+        else -> OverlayDisplayConfig.SIZE_M
     }
 
-    private fun updateExistingWidgets() {
-        val intent = Intent(this, RangeUpdateService::class.java)
-        startForegroundService(intent)
-
-        val appWidgetManager = AppWidgetManager.getInstance(this)
-        val componentName = ComponentName(this, RangeWidgetProvider::class.java)
-        val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
-        if (widgetIds.isEmpty()) return
-
-        val updateIntent = Intent(this, RangeWidgetProvider::class.java).apply {
-            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+    /** Выбрать RadioButton в группе, соответствующий заданному размеру sp. */
+    private fun spToRadioId(group: RadioGroup, sp: Int): Int {
+        val offId = when (group.id) {
+            R.id.rgTotal     -> R.id.rgTotalOff
+            R.id.rgBreakdown -> R.id.rgBdOff
+            else             -> R.id.rgInfoOff
         }
-        sendBroadcast(updateIntent)
-        updateStatusText()
-    }
-
-    private fun openFlymeWidgetPicker() {
-        val opened = FlymeWidgetHelper.openWidgetPicker(this)
-        FlymeWidgetHelper.installHomeShortcut(this)
-        Toast.makeText(
-            this,
-            if (opened) R.string.widget_picker_opened else R.string.widget_bind_failed,
-            Toast.LENGTH_LONG
-        ).show()
-    }
-
-    private fun returnShortcutResult(appWidgetId: Int) {
-        val shortcutIntent = Intent(this, WidgetActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        val sId = when (group.id) {
+            R.id.rgTotal     -> R.id.rgTotalS
+            R.id.rgBreakdown -> R.id.rgBdS
+            else             -> R.id.rgInfoS
         }
-
-        val result = Intent().apply {
-            putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent)
-            putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.widget_shortcut_name))
-            putExtra(
-                Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-                Intent.ShortcutIconResource.fromContext(this@WidgetActivity, R.mipmap.ic_launcher)
-            )
+        val mId = when (group.id) {
+            R.id.rgTotal     -> R.id.rgTotalM
+            R.id.rgBreakdown -> R.id.rgBdM
+            else             -> R.id.rgInfoM
         }
-        setResult(RESULT_OK, result)
-        finish()
+        val lId = when (group.id) {
+            R.id.rgTotal     -> R.id.rgTotalL
+            R.id.rgBreakdown -> R.id.rgBdL
+            else             -> R.id.rgInfoL
+        }
+        val xlId = when (group.id) {
+            R.id.rgTotal     -> R.id.rgTotalXL
+            R.id.rgBreakdown -> R.id.rgBdXL
+            else             -> R.id.rgInfoXL
+        }
+        return when (sp) {
+            OverlayDisplayConfig.SIZE_OFF -> offId
+            OverlayDisplayConfig.SIZE_S   -> sId
+            OverlayDisplayConfig.SIZE_M   -> mId
+            OverlayDisplayConfig.SIZE_L   -> lId
+            OverlayDisplayConfig.SIZE_XL  -> xlId
+            else -> mId
+        }
     }
 }
