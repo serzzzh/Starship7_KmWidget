@@ -5,38 +5,49 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="#DD000000"
-    android:padding="10dp"
-    android:minWidth="140dp"
-    android:gravity="center">
+    android:padding="12dp"
+    android:minWidth="160dp"
+    android:gravity="center_horizontal">
 
-    <!-- Иконка + заголовок -->
+    <!-- Заголовок -->
     <TextView
+        android:id="@+id/overlay_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="🛣 Range"
-        android:textColor="#888888"
-        android:textSize="9sp"
-        android:letterSpacing="0.1" />
+        android:textColor="#777777"
+        android:textSize="10sp"
+        android:letterSpacing="0.05" />
 
-    <!-- Основной текст: EV XXX | ⛽ YYY km -->
+    <!-- Итого км — главная цифра -->
     <TextView
         android:id="@+id/overlay_range"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="-- km"
         android:textColor="#00FF88"
-        android:textSize="22sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp" />
+        android:layout_marginTop="2dp" />
 
-    <!-- Доп. строка: 🔋65% ⛽80% -->
+    <!-- Разбивка EV + Fuel -->
+    <TextView
+        android:id="@+id/overlay_breakdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔋-- + ⛽--"
+        android:textColor="#CCCCCC"
+        android:textSize="13sp"
+        android:layout_marginTop="1dp" />
+
+    <!-- Доп. строка: % заряда/топлива -->
     <TextView
         android:id="@+id/overlay_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="..."
-        android:textColor="#AAAAAA"
-        android:textSize="11sp" />
+        android:textColor="#888888"
+        android:textSize="10sp"
+        android:layout_marginTop="2dp" />
 
 </LinearLayout>
