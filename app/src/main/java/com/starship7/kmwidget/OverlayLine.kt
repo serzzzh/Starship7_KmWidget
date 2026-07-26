@@ -1,7 +1,7 @@
 package com.starship7.kmwidget
 
-enum class OverlayLineType    { BATTERY, FUEL }
-enum class OverlayLineDisplay { KM, LITERS, PERCENT }
+enum class OverlayLineType    { BATTERY, FUEL, TEXT, SUM }
+enum class OverlayLineDisplay { KM, LITERS, PERCENT, NONE }
 
 /** Одна отображаемая строка (внутренняя). */
 data class OverlayLine(
@@ -17,29 +17,27 @@ data class OverlayLine(
         const val SIZE_XL = 38
 
         // Объём бака Geely Galaxy Starship 7 (для перевода % → литры)
-        const val FUEL_TANK_LITERS = 55f
+        const val FUEL_TANK_LITERS = 50f
     }
 }
 
 /**
  * Одна запись настроек (кнопка «+»).
- * Содержит батарею и/или топливо — каждое со своим стилем и размером.
- * Если [combineLine] = true и оба включены — выводятся на ОДНОЙ строке.
+ * Содержит текст, сумму, батарею, топливо — каждое со своим стилем и размером.
  */
 data class OverlayEntry(
-    val batteryEnabled: Boolean            = true,
+    val textEnabled: Boolean               = false,
+    val textValue: String                  = "",
+    val textSizeSp: Int                    = OverlayLine.SIZE_M,
+
+    val sumEnabled: Boolean                = false,
+    val sumSizeSp: Int                     = OverlayLine.SIZE_M,
+
+    val batteryEnabled: Boolean            = false,
     val batteryDisplay: OverlayLineDisplay = OverlayLineDisplay.PERCENT,
     val batterySizeSp: Int                 = OverlayLine.SIZE_M,
 
-    val fuelEnabled: Boolean               = true,
+    val fuelEnabled: Boolean               = false,
     val fuelDisplay: OverlayLineDisplay    = OverlayLineDisplay.KM,
-    val fuelSizeSp: Int                    = OverlayLine.SIZE_M,
-
-    val combineLine: Boolean               = true   // оба на одной строке
-) {
-    /** Развернуть в список строк (для раздельного рендеринга). */
-    fun toLines(): List<OverlayLine> = buildList {
-        if (batteryEnabled) add(OverlayLine(OverlayLineType.BATTERY, batteryDisplay, batterySizeSp))
-        if (fuelEnabled)    add(OverlayLine(OverlayLineType.FUEL,    fuelDisplay,    fuelSizeSp))
-    }
-}
+    val fuelSizeSp: Int                    = OverlayLine.SIZE_M
+)

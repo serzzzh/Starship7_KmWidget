@@ -187,28 +187,52 @@ class OverlayService : Service() {
         if (!s.isConnected) return
 
         for (entry in OverlaySettings.loadEntries(this)) {
-            if (!entry.batteryEnabled && !entry.fuelEnabled) continue
+            if (!entry.textEnabled && !entry.sumEnabled && !entry.batteryEnabled && !entry.fuelEnabled) continue
 
-            // Комбинированная строка: батарея + бензин на одной
-            if (entry.combineLine && entry.batteryEnabled && entry.fuelEnabled) {
-                val batPart  = formatPart(OverlayLineType.BATTERY, entry.batteryDisplay, s)
-                val fuelPart = formatPart(OverlayLineType.FUEL,    entry.fuelDisplay,    s)
-                val combined = listOfNotNull(batPart, fuelPart).joinToString("  |  ")
-                if (combined.isNotEmpty()) {
-                    addTextView(container, combined,
-                        maxOf(entry.batterySizeSp, entry.fuelSizeSp))
-                }
-            } else {
-                // Раздельные строки
-                if (entry.batteryEnabled) {
-                    val t = formatPart(OverlayLineType.BATTERY, entry.batteryDisplay, s)
-                    if (t != null) addTextView(container, t, entry.batterySizeSp)
-                }
-                if (entry.fuelEnabled) {
-                    val t = formatPart(OverlayLineType.FUEL, entry.fuelDisplay, s)
-                    if (t != null) addTextView(container, t, entry.fuelSizeSp)
-                }
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 2 }
             }
+
+            var added = false
+            fun addPart(text: String?, sizeSp: Int, color: String = "#CCCCCC") {
+                if (text == null) return
+                if (added) {
+                    row.addView(TextView(this@OverlayService).apply {
+                        this.text = "  |  "
+                        textSize = 14f
+                        setTextColor(Color.parseColor("#888888"))
+                    })
+                }
+                row.addView(TextView(this@OverlayService).apply {
+                    this.text = text
+                    textSize = sizeSp.toFloat()
+                    setTextColor(Color.parseColor(color))
+                })
+                added = true
+            }
+
+            if (entry.textEnabled && entry.textValue.isNotBlank()) {
+                addPart(entry.textValue, entry.textSizeSp, "#FFFFFF")
+            }
+            if (entry.sumEnabled) {
+                val total = (if(s.evRangeKm > 0) s.evRangeKm else 0f) + (if(s.fuelRangeKm > 0) s.fuelRangeKm else 0f)
+                if (total > 0) addPart("≈ ${total.toInt()} км", entry.sumSizeSp, "#CCCCCC")
+            }
+            if (entry.batteryEnabled) {
+                val t = formatPart(OverlayLineType.BATTERY, entry.batteryDisplay, s)
+                addPart(t, entry.batterySizeSp, "#CCCCCC")
+            }
+            if (entry.fuelEnabled) {
+                val t = formatPart(OverlayLineType.FUEL, entry.fuelDisplay, s)
+                addPart(t, entry.fuelSizeSp, "#CCCCCC")
+            }
+
+            if (added) container.addView(row)
         }
     }
 
@@ -226,18 +250,6 @@ class OverlayService : Service() {
                 if (s.fuelPct     >= 0) "⛽${s.fuelPct.toInt()}%"         else null
             else -> null
         }
-
-    private fun addTextView(container: LinearLayout, text: String, sizeSp: Int) {
-        container.addView(TextView(this).apply {
-            this.text = text
-            textSize  = sizeSp.toFloat()
-            setTextColor(Color.parseColor("#CCCCCC"))
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = 2 }
-        })
-    }
 
     private fun removeOverlay() {
         handler.removeCallbacks(updateRunnable)

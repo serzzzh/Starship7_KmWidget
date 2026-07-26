@@ -11,7 +11,7 @@ data class CarSnapshot(
     val fuelRangeKm: Float = 0f,
     val batteryPct:  Float = -1f,
     val fuelPct:     Float = -1f,
-    val fuelLiters:  Float = -1f,  // литры (fuelPct * 55 / 100)
+    val fuelLiters:  Float = -1f,  // литры (fuelPct * 50 / 100)
     val isConnected: Boolean = false
 )
 
@@ -80,27 +80,67 @@ object RangeCalculator {
         )
 
         // ── История поездок ───────────────────────────────────────────────
-        val stats = if (config.isTimeBased) {
-            dbHelper.getStatsSinceMinutes(config.timeValue)
+        
+        // 1. Долгосрочная эффективность (вся история за 7 дней, реальные старые периоды)
+        val longTermEff = dbHelper.getEfficiencySinceTime(0L)
+        
+        // 2. Краткосрочная эффективность (текущий режим - скорость убывания сейчас)
+        val shortTermEff = if (config.isTimeBased) {
+            dbHelper.getEfficiencySinceTime(System.currentTimeMillis() - config.timeValue * 60_000L)
         } else {
-            dbHelper.getStatsSinceKm(config.kmValue)
+            dbHelper.getEfficiencySinceKm(config.kmValue)
         }
 
-        if (stats != null && stats.deltaOdo > 1) {
-            val evRange   = if (stats.deltaBat  > 1f && currentBat  > 0) (stats.deltaOdo / stats.deltaBat)  * currentBat  else carEv
-            val fuelRange = if (stats.deltaFuel > 1f && currentFuel > 0) (stats.deltaOdo / stats.deltaFuel) * currentFuel else carFuel
+        var finalEvEff = 0f
+        var finalFuelEff = 0f
 
-            val total  = evRange + fuelRange
+        val shortValidEv = shortTermEff.isValidEv(1.0f)
+        val longValidEv = longTermEff.isValidEv(2.0f)
+        
+        val shortValidFuel = shortTermEff.isValidFuel(0.5f)
+        val longValidFuel = longTermEff.isValidFuel(1.0f)
+
+        // Подсчет эффективности EV (км на 1% батареи)
+        if (shortValidEv && longValidEv) {
+            // Смешиваем: 70% на текущий режим (скорость 130 или город) и 30% на старые данные
+            finalEvEff = shortTermEff.evKmPerPct * 0.7f + longTermEff.evKmPerPct * 0.3f
+        } else if (shortValidEv) {
+            finalEvEff = shortTermEff.evKmPerPct
+        } else if (longValidEv) {
+            finalEvEff = longTermEff.evKmPerPct
+        } else if (currentBat > 0 && carEv > 0) {
+            finalEvEff = carEv / currentBat // нативный запас (fallback)
+        }
+
+        // Подсчет эффективности Fuel (км на 1% бака)
+        if (shortValidFuel && longValidFuel) {
+            finalFuelEff = shortTermEff.fuelKmPerPct * 0.7f + longTermEff.fuelKmPerPct * 0.3f
+        } else if (shortValidFuel) {
+            finalFuelEff = shortTermEff.fuelKmPerPct
+        } else if (longValidFuel) {
+            finalFuelEff = longTermEff.fuelKmPerPct
+        } else if (currentFuel > 0 && carFuel > 0) {
+            finalFuelEff = carFuel / currentFuel // нативный запас (fallback)
+        }
+
+        // Вычисляем финальный запас хода на основе посчитанных эффективностей
+        val calculatedEvRange = if (finalEvEff > 0 && currentBat > 0) finalEvEff * currentBat else carEv
+        val calculatedFuelRange = if (finalFuelEff > 0 && currentFuel > 0) finalFuelEff * currentFuel else carFuel
+
+        val isUsingCalculatedData = finalEvEff > 0 || finalFuelEff > 0
+
+        if (isUsingCalculatedData) {
+            val total = calculatedEvRange + calculatedFuelRange
             val period = if (config.isTimeBased) "${config.timeValue} мин" else "${config.kmValue.toInt()} км"
             return RangeResult(
                 totalText     = "${formatKm(total)} км",
-                breakdownText = "🔋${formatKm(evRange)} + ⛽${formatKm(fuelRange)} км",
-                infoText      = "🔋$batStr  ⛽$fuelStr  ($period)",
-                snapshot      = snapshot.copy(evRangeKm = evRange, fuelRangeKm = fuelRange)
+                breakdownText = "🔋${formatKm(calculatedEvRange)} + ⛽${formatKm(calculatedFuelRange)} км",
+                infoText      = "🔋$batStr  ⛽$fuelStr  ($period/Hist)",
+                snapshot      = snapshot.copy(evRangeKm = calculatedEvRange, fuelRangeKm = calculatedFuelRange)
             )
         }
 
-        // ── Fallback: данные от авто ──────────────────────────────────────
+        // ── Fallback: данные от авто (если вообще нет истории) ────────────
         return if (carEv > 0 || carFuel > 0) {
             val total = carEv + carFuel
             RangeResult(
@@ -123,8 +163,8 @@ object RangeCalculator {
         val i = km.toInt()
         return if (i >= 1000) {
             val t = i / 1000
-            val h = (i % 1000) / 100
-            "$t ${h}00"   // e.g. "1 200"
+            val rest = (i % 1000).toString().padStart(3, '0')
+            "$t $rest"
         } else i.toString()
     }
 
