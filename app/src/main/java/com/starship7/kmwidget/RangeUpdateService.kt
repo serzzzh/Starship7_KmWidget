@@ -56,7 +56,7 @@ class RangeUpdateService : Service() {
 
         Log.i(TAG, "Collected: ODO=$odometer EV_ODO=$evOdo FUEL_ODO=$fuelOdo BAT=$battery FUEL=$fuel")
 
-        if (odometer > 0) {
+        if (odometer > 0 && evOdo > 0 && fuelOdo > 0) {
             dbHelper.insertLog(System.currentTimeMillis(), odometer, evOdo, fuelOdo, battery, fuel)
         }
         // Update widgets regardless — show current battery/fuel even if no history yet
