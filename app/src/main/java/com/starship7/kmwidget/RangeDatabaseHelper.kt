@@ -73,6 +73,27 @@ class RangeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "RangeDa
         var segStartBat = cursor.getFloat(2)
         var segStartFuel = cursor.getFloat(3)
 
+        // Игнорируем стартовые нули, которые могут быть при первой записи после обновления БД
+        if (segStartEvOdo == 0f && segStartFuelOdo == 0f) {
+            var foundValid = false
+            while (cursor.moveToNext()) {
+                val eOdo = cursor.getFloat(4)
+                val fOdo = cursor.getFloat(5)
+                if (eOdo > 0f || fOdo > 0f) {
+                    segStartEvOdo = eOdo
+                    segStartFuelOdo = fOdo
+                    segStartBat = cursor.getFloat(2)
+                    segStartFuel = cursor.getFloat(3)
+                    foundValid = true
+                    break
+                }
+            }
+            if (!foundValid) {
+                cursor.close()
+                return eff
+            }
+        }
+
         var prevEvOdo = segStartEvOdo
         var prevFuelOdo = segStartFuelOdo
         var prevBat = segStartBat
@@ -83,6 +104,8 @@ class RangeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "RangeDa
             val currFuelOdo = cursor.getFloat(5)
             val currBat = cursor.getFloat(2)
             val currFuel = cursor.getFloat(3)
+            
+            if (currEvOdo == 0f && currFuelOdo == 0f) continue // Защита от мусорных нулей от API
 
             // Если машина зарядилась или заправилась, либо сбросился одометр -> завершаем сегмент
             val batIncreased = currBat > prevBat + 0.5f

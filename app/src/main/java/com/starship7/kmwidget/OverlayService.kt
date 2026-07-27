@@ -169,7 +169,9 @@ class OverlayService : Service() {
             val fuelOdo = vh.getFloatProperty(PropertyConstants.VehicleInfo.MILEAGE_SINCE_LAST_OIL, 0)
             val bat  = vh.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
             val fuel = vh.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 0).toFloat()
-            if (odo > 0) db.insertLog(System.currentTimeMillis(), odo, evOdo, fuelOdo, bat, fuel)
+            if (odo > 0 && evOdo > 0 && fuelOdo > 0) {
+                db.insertLog(System.currentTimeMillis(), odo, evOdo, fuelOdo, bat, fuel)
+            }
         }
 
         // Дополнительные строки

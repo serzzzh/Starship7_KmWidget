@@ -144,6 +144,13 @@ object RangeCalculator {
 
         val isUsingCalculatedData = finalEvEff > 0 || finalFuelEff > 0
 
+        // Важно: в Snapshot мы должны класть ИМЕННО пересчитанные данные для отрисовки доп строк,
+        // даже если они не идеальны, чтобы виджет показывал реальную картину
+        val finalSnapshot = snapshot.copy(
+            evRangeKm = if (isUsingCalculatedData) calculatedEvRange else carEv,
+            fuelRangeKm = if (isUsingCalculatedData) calculatedFuelRange else carFuel
+        )
+
         if (isUsingCalculatedData) {
             val total = calculatedEvRange + calculatedFuelRange
             val period = if (config.isTimeBased) "${config.timeValue} мин" else "${config.kmValue.toInt()} км"
@@ -151,7 +158,7 @@ object RangeCalculator {
                 totalText     = "${formatKm(total)} км",
                 breakdownText = "🔋${formatKm(calculatedEvRange)} + ⛽${formatKm(calculatedFuelRange)} км",
                 infoText      = "🔋$batStr  ⛽$fuelStr  ($period/Hist)",
-                snapshot      = snapshot.copy(evRangeKm = calculatedEvRange, fuelRangeKm = calculatedFuelRange)
+                snapshot      = finalSnapshot
             )
         }
 
@@ -162,7 +169,7 @@ object RangeCalculator {
                 totalText     = "${formatKm(total)} км",
                 breakdownText = buildBreakdown(carEv, carFuel),
                 infoText      = "🔋$batStr  ⛽$fuelStr",
-                snapshot      = snapshot
+                snapshot      = finalSnapshot
             )
         } else {
             RangeResult(
