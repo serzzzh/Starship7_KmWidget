@@ -73,7 +73,8 @@ object RangeCalculator {
         val fuelStr = if (currentFuel >= 0) "${currentFuel.toInt()}%" else "?"
 
         val navDist = vehicleHelper.getIntProperty(557872641, 0).toFloat() // FUNC_NAVI_VEHICLE_DESTINATION_DISTANCE
-        val batTemp = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_TEMP, 20f)
+        val rawBatTemp = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_TEMP, 0)
+        val batTemp = if (rawBatTemp > -100f) rawBatTemp else 20f
         
         // Температурный коэффициент: от 1.0 при +20°C до 0.6 при -20°C (падение 1% запаса на каждый градус холода)
         val tempCoeff = if (batTemp >= 20f) {
