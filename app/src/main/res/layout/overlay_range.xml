@@ -7,22 +7,13 @@
     android:padding="12dp"
     android:background="#CC000000">
 
-    <!-- Главная строка: Запас хода -->
-    <TextView
-        android:id="@+id/overlay_range"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="-- км"
-        android:textSize="28sp"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold" />
-
+    <!-- Главная строка: Запас хода убрана по запросу -->
+    
     <!-- Дополнительные строки (заполняются динамически) -->
     <LinearLayout
         android:id="@+id/overlay_lines"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="2dp" />
+        android:orientation="vertical" />
 
 </LinearLayout>

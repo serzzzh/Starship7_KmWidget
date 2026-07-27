@@ -12,6 +12,8 @@ data class CarSnapshot(
     val batteryPct:  Float = -1f,
     val fuelPct:     Float = -1f,
     val fuelLiters:  Float = -1f,  // литры (fuelPct * 50 / 100)
+    val navDist:     Float = 0f,   // расстояние до пункта назначения по навигатору
+    val driveMode:   String = "",  // текущий режим вождения
     val isConnected: Boolean = false
 )
 
@@ -70,12 +72,25 @@ object RangeCalculator {
         val batStr  = if (currentBat  >= 0) "${currentBat.toInt()}%"  else "?"
         val fuelStr = if (currentFuel >= 0) "${currentFuel.toInt()}%" else "?"
 
+        val navDist = vehicleHelper.getIntProperty(557872641, 0).toFloat() // FUNC_NAVI_VEHICLE_DESTINATION_DISTANCE
+        
+        val modeInt = vehicleHelper.getIntProperty(557871372, 0) // DM_FUNC_DRIVE_MODE_SELECT
+        val modeStr = when (modeInt) {
+            0 -> "Гибрид"
+            2 -> "Спорт"
+            16 -> "Электро"
+            24 -> "Авто"
+            else -> "Режим $modeInt"
+        }
+
         val snapshot = CarSnapshot(
             evRangeKm   = carEv,
             fuelRangeKm = carFuel,
             batteryPct  = currentBat,
             fuelPct     = currentFuel,
             fuelLiters  = if (currentFuel >= 0) currentFuel / 100f * OverlayLine.FUEL_TANK_LITERS else -1f,
+            navDist     = if (navDist > 5000f) navDist / 1000f else navDist, // Конвертируем из метров в км, если нужно
+            driveMode   = modeStr,
             isConnected = true
         )
 

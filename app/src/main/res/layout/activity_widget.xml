@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Настройки оверлея"
-                android:textSize="20sp"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
             <Button
@@ -31,37 +31,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Выключить"
-                android:textSize="13sp" />
+                android:textSize="16sp" />
         </LinearLayout>
-
-        <!-- ══ Запас хода: размер ════════════════════════════════════ -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Запас хода — размер"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
-
-        <RadioGroup
-            android:id="@+id/rgRangeSize"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="20dp">
-            <RadioButton android:id="@+id/rgRangeS"  android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="S"
-                android:minWidth="0dp" android:layout_marginEnd="10dp" />
-            <RadioButton android:id="@+id/rgRangeM"  android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="M"
-                android:minWidth="0dp" android:layout_marginEnd="10dp" />
-            <RadioButton android:id="@+id/rgRangeL"  android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="L"
-                android:checked="true" android:minWidth="0dp" android:layout_marginEnd="10dp" />
-            <RadioButton android:id="@+id/rgRangeXL" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="XL"
-                android:minWidth="0dp" />
-        </RadioGroup>
 
         <!-- ══ Дополнительные строки ═════════════════════════════════ -->
         <LinearLayout
@@ -75,8 +46,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Дополнительные строки"
-                android:textSize="14sp"
+                android:text="Строки виджета"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <Button
@@ -84,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="+"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 android:minWidth="0dp"
                 android:paddingHorizontal="12dp" />
         </LinearLayout>
@@ -100,8 +71,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Окно расчёта"
-            android:textSize="14sp"
+            android:text="Окно расчёта эффективности"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
 
@@ -112,10 +83,12 @@
             android:orientation="horizontal">
             <RadioButton android:id="@+id/radioTime" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Последние N минут" android:checked="true" />
+                android:textSize="16sp"
+                android:text="За N минут" android:checked="true" />
             <RadioButton android:id="@+id/radioKm" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Последние X км"
+                android:textSize="16sp"
+                android:text="За X км"
                 android:layout_marginStart="14dp" />
         </RadioGroup>
 
@@ -124,6 +97,7 @@
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:hint="Значение"
+            android:textSize="18sp"
             android:inputType="numberDecimal"
             android:layout_marginTop="6dp" />
 

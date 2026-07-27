@@ -6,153 +6,125 @@
     android:orientation="vertical"
     android:padding="8dp"
     android:background="#1AFFFFFF"
-    android:layout_marginBottom="6dp">
+    android:layout_marginBottom="8dp">
 
+    <!-- Container that visually rearanges checkboxes to show the order -->
     <LinearLayout
+        android:id="@+id/checkboxesContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginBottom="4dp">
         
-        <CheckBox
-            android:id="@+id/cbText"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Текст"
-            android:textColor="#EEEEEE"
-            android:textSize="12sp"
-            android:minWidth="0dp" />
-
-        <CheckBox
-            android:id="@+id/cbSum"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Сумма"
-            android:textColor="#EEEEEE"
-            android:textSize="12sp"
-            android:minWidth="0dp" />
-
-        <CheckBox
-            android:id="@+id/cbBattery"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="АКБ"
-            android:textColor="#EEEEEE"
-            android:textSize="12sp"
-            android:minWidth="0dp" />
-
-        <CheckBox
-            android:id="@+id/cbFuel"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Бензин"
-            android:textColor="#EEEEEE"
-            android:textSize="12sp"
-            android:minWidth="0dp" />
+        <CheckBox android:id="@+id/cbText" layout_width="wrap_content" layout_height="wrap_content" text="Текст" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
+        <CheckBox android:id="@+id/cbSum" layout_width="wrap_content" layout_height="wrap_content" text="Сумма" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
+        <CheckBox android:id="@+id/cbBattery" layout_width="wrap_content" layout_height="wrap_content" text="АКБ" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
+        <CheckBox android:id="@+id/cbFuel" layout_width="wrap_content" layout_height="wrap_content" text="Бензин" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
+        <CheckBox android:id="@+id/cbMode" layout_width="wrap_content" layout_height="wrap_content" text="Режим" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
     </LinearLayout>
 
     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" android:layout_marginVertical="2dp" />
 
-    <!-- ─── Опции Текста ────────────────────────────────────────────────── -->
+    <!-- Container for Options to reorder them vertically based on selection order -->
     <LinearLayout
-        android:id="@+id/layTextOptions"
+        android:id="@+id/optionsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:visibility="gone"
-        android:minHeight="32dp">
-        <TextView android:layout_width="45dp" android:layout_height="wrap_content" android:text="Текст:" android:textColor="#AAA" android:textSize="11sp"/>
-        <EditText
-            android:id="@+id/etTextValue"
-            android:layout_width="0dp"
+        android:orientation="vertical">
+
+        <!-- ─── Опции Текста ────────────────────────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/layTextOptions"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Текст"
-            android:textColor="#FFF"
-            android:textColorHint="#666"
-            android:textSize="12sp"
-            android:backgroundTint="#555"
-            android:padding="4dp" />
-        <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="4dp" />
-        <RadioGroup android:id="@+id/rgTextSize" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <RadioButton android:id="@+id/rbTextS" layout_width="wrap_content" layout_height="wrap_content" text="S" textColor="#CCC" textSize="11sp" minWidth="0dp"/>
-            <RadioButton android:id="@+id/rbTextM" layout_width="wrap_content" layout_height="wrap_content" text="M" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbTextL" layout_width="wrap_content" layout_height="wrap_content" text="L" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbTextXL" layout_width="wrap_content" layout_height="wrap_content" text="XL" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-        </RadioGroup>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:minHeight="40dp">
+            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Текст:" android:textColor="#AAA" android:textSize="14sp"/>
+            <EditText
+                android:id="@+id/etTextValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Текст"
+                android:textColor="#FFF"
+                android:textColorHint="#666"
+                android:textSize="16sp"
+                android:backgroundTint="#555"
+                android:padding="4dp" />
+            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
+            <Spinner android:id="@+id/spinTextSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
 
-    <!-- ─── Опции Суммы ─────────────────────────────────────────────────── -->
-    <LinearLayout
-        android:id="@+id/laySumOptions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:visibility="gone"
-        android:minHeight="32dp">
-        <TextView android:layout_width="45dp" android:layout_height="wrap_content" android:text="Сумма:" android:textColor="#AAA" android:textSize="11sp"/>
-        <Space android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
-        <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="4dp" />
-        <RadioGroup android:id="@+id/rgSumSize" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <RadioButton android:id="@+id/rbSumS" layout_width="wrap_content" layout_height="wrap_content" text="S" textColor="#CCC" textSize="11sp" minWidth="0dp"/>
-            <RadioButton android:id="@+id/rbSumM" layout_width="wrap_content" layout_height="wrap_content" text="M" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbSumL" layout_width="wrap_content" layout_height="wrap_content" text="L" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbSumXL" layout_width="wrap_content" layout_height="wrap_content" text="XL" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-        </RadioGroup>
-    </LinearLayout>
+        <!-- ─── Опции Суммы ─────────────────────────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/laySumOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:minHeight="40dp">
+            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Сумма:" android:textColor="#AAA" android:textSize="14sp"/>
+            <Space android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
+            <Spinner android:id="@+id/spinSumSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
 
-    <!-- ─── Опции АКБ ──────────────────────────────────────────────────── -->
-    <LinearLayout
-        android:id="@+id/layBatOptions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:visibility="gone"
-        android:minHeight="32dp">
-        <TextView android:layout_width="45dp" android:layout_height="wrap_content" android:text="АКБ:" android:textColor="#AAA" android:textSize="11sp"/>
-        <RadioGroup android:id="@+id/rgBatDisplay" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal">
-            <RadioButton android:id="@+id/rbBatKm" layout_width="wrap_content" layout_height="wrap_content" text="км" textColor="#CCC" textSize="11sp" minWidth="0dp"/>
-            <RadioButton android:id="@+id/rbBatPercent" layout_width="wrap_content" layout_height="wrap_content" text="%" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="4dp"/>
-        </RadioGroup>
-        <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="4dp" />
-        <RadioGroup android:id="@+id/rgBatSize" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <RadioButton android:id="@+id/rbBatS" layout_width="wrap_content" layout_height="wrap_content" text="S" textColor="#CCC" textSize="11sp" minWidth="0dp"/>
-            <RadioButton android:id="@+id/rbBatM" layout_width="wrap_content" layout_height="wrap_content" text="M" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbBatL" layout_width="wrap_content" layout_height="wrap_content" text="L" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbBatXL" layout_width="wrap_content" layout_height="wrap_content" text="XL" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-        </RadioGroup>
-    </LinearLayout>
+        <!-- ─── Опции АКБ ──────────────────────────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/layBatOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:minHeight="40dp">
+            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="АКБ:" android:textColor="#AAA" android:textSize="14sp"/>
+            <!-- Единицы батареи: км | % -->
+            <RadioGroup android:id="@+id/rgBatDisplay" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal">
+                <RadioButton android:id="@+id/rbBatKm" layout_width="wrap_content" layout_height="wrap_content" text="км" textColor="#CCC" textSize="14sp" minWidth="0dp"/>
+                <RadioButton android:id="@+id/rbBatPercent" layout_width="wrap_content" layout_height="wrap_content" text="%" textColor="#CCC" textSize="14sp" minWidth="0dp" layout_marginStart="6dp"/>
+            </RadioGroup>
+            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
+            <Spinner android:id="@+id/spinBatSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
 
-    <!-- ─── Опции Бензина ──────────────────────────────────────────────── -->
-    <LinearLayout
-        android:id="@+id/layFuelOptions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:visibility="gone"
-        android:minHeight="32dp">
-        <TextView android:layout_width="45dp" android:layout_height="wrap_content" android:text="Бензин:" android:textColor="#AAA" android:textSize="11sp"/>
-        <RadioGroup android:id="@+id/rgFuelDisplay" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal">
-            <RadioButton android:id="@+id/rbFuelKm" layout_width="wrap_content" layout_height="wrap_content" text="км" textColor="#CCC" textSize="11sp" minWidth="0dp"/>
-            <RadioButton android:id="@+id/rbFuelLiters" layout_width="wrap_content" layout_height="wrap_content" text="л" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="4dp"/>
-            <RadioButton android:id="@+id/rbFuelPercent" layout_width="wrap_content" layout_height="wrap_content" text="%" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="4dp"/>
-        </RadioGroup>
-        <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="4dp" />
-        <RadioGroup android:id="@+id/rgFuelSize" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
-            <RadioButton android:id="@+id/rbFuelS" layout_width="wrap_content" layout_height="wrap_content" text="S" textColor="#CCC" textSize="11sp" minWidth="0dp"/>
-            <RadioButton android:id="@+id/rbFuelM" layout_width="wrap_content" layout_height="wrap_content" text="M" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbFuelL" layout_width="wrap_content" layout_height="wrap_content" text="L" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-            <RadioButton android:id="@+id/rbFuelXL" layout_width="wrap_content" layout_height="wrap_content" text="XL" textColor="#CCC" textSize="11sp" minWidth="0dp" layout_marginStart="2dp"/>
-        </RadioGroup>
+        <!-- ─── Опции Бензина ──────────────────────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/layFuelOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:minHeight="40dp">
+            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Бензин:" android:textColor="#AAA" android:textSize="14sp"/>
+            <RadioGroup android:id="@+id/rgFuelDisplay" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal">
+                <RadioButton android:id="@+id/rbFuelKm" layout_width="wrap_content" layout_height="wrap_content" text="км" textColor="#CCC" textSize="14sp" minWidth="0dp"/>
+                <RadioButton android:id="@+id/rbFuelLiters" layout_width="wrap_content" layout_height="wrap_content" text="л" textColor="#CCC" textSize="14sp" minWidth="0dp" layout_marginStart="6dp"/>
+                <RadioButton android:id="@+id/rbFuelPercent" layout_width="wrap_content" layout_height="wrap_content" text="%" textColor="#CCC" textSize="14sp" minWidth="0dp" layout_marginStart="6dp"/>
+            </RadioGroup>
+            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
+            <Spinner android:id="@+id/spinFuelSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- ─── Опции Режима ────────────────────────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/layModeOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:minHeight="40dp">
+            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Режим:" android:textColor="#AAA" android:textSize="14sp"/>
+            <Space android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
+            <Spinner android:id="@+id/spinModeSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
 
     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" android:layout_marginVertical="2dp" />
@@ -164,10 +136,10 @@
         android:gravity="end|center_vertical">
         <Button
             android:id="@+id/btnDeleteEntry"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:text="✕"
-            android:textSize="14sp"
+            android:textSize="18sp"
             android:textColor="#FF6666"
             android:background="@android:color/transparent"
             android:padding="4dp" />

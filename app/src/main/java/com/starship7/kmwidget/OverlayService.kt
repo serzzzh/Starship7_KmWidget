@@ -165,16 +165,12 @@ class OverlayService : Service() {
 
         if (vh.isConnected) {
             val odo  = vh.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
+            val evOdo = vh.getFloatProperty(PropertyConstants.VehicleInfo.MILEAGE_SINCE_LAST_EV, 0)
+            val fuelOdo = vh.getFloatProperty(PropertyConstants.VehicleInfo.MILEAGE_SINCE_LAST_OIL, 0)
             val bat  = vh.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
             val fuel = vh.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 0).toFloat()
-            Log.i(TAG, "ODO=$odo BAT=$bat% FUEL=$fuel% → ${result.totalText}")
-            if (odo > 0) db.insertLog(System.currentTimeMillis(), odo, bat, fuel)
+            if (odo > 0) db.insertLog(System.currentTimeMillis(), odo, evOdo, fuelOdo, bat, fuel)
         }
-
-        // Главная строка
-        val rangeView = view.findViewById<TextView>(R.id.overlay_range)
-        rangeView.text     = result.totalText
-        rangeView.textSize = OverlaySettings.getRangeSize(this).toFloat()
 
         // Дополнительные строки
         val container = view.findViewById<LinearLayout>(R.id.overlay_lines)
@@ -187,7 +183,7 @@ class OverlayService : Service() {
         if (!s.isConnected) return
 
         for (entry in OverlaySettings.loadEntries(this)) {
-            if (!entry.textEnabled && !entry.sumEnabled && !entry.batteryEnabled && !entry.fuelEnabled) continue
+            if (entry.renderOrder.isEmpty()) continue
 
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -216,20 +212,42 @@ class OverlayService : Service() {
                 added = true
             }
 
-            if (entry.textEnabled && entry.textValue.isNotBlank()) {
-                addPart(entry.textValue, entry.textSizeSp, "#FFFFFF")
-            }
-            if (entry.sumEnabled) {
-                val total = (if(s.evRangeKm > 0) s.evRangeKm else 0f) + (if(s.fuelRangeKm > 0) s.fuelRangeKm else 0f)
-                if (total > 0) addPart("≈ ${total.toInt()} км", entry.sumSizeSp, "#CCCCCC")
-            }
-            if (entry.batteryEnabled) {
-                val t = formatPart(OverlayLineType.BATTERY, entry.batteryDisplay, s)
-                addPart(t, entry.batterySizeSp, "#CCCCCC")
-            }
-            if (entry.fuelEnabled) {
-                val t = formatPart(OverlayLineType.FUEL, entry.fuelDisplay, s)
-                addPart(t, entry.fuelSizeSp, "#CCCCCC")
+            for (partKey in entry.renderOrder) {
+                when (partKey) {
+                    "TEXT" -> {
+                        if (entry.textEnabled && entry.textValue.isNotBlank()) {
+                            addPart(entry.textValue, entry.textSizeSp, "#FFFFFF")
+                        }
+                    }
+                    "SUM" -> {
+                        if (entry.sumEnabled) {
+                            val total = (if(s.evRangeKm > 0) s.evRangeKm else 0f) + (if(s.fuelRangeKm > 0) s.fuelRangeKm else 0f)
+                            if (total > 0) addPart("≈ ${total.toInt()} км", entry.sumSizeSp, "#CCCCCC")
+                        }
+                    }
+                    "BATTERY" -> {
+                        if (entry.batteryEnabled) {
+                            val t = formatPart(OverlayLineType.BATTERY, entry.batteryDisplay, s)
+                            addPart(t, entry.batterySizeSp, "#CCCCCC")
+                        }
+                    }
+                    "FUEL" -> {
+                        if (entry.fuelEnabled) {
+                            val t = formatPart(OverlayLineType.FUEL, entry.fuelDisplay, s)
+                            addPart(t, entry.fuelSizeSp, "#CCCCCC")
+                        }
+                    }
+                    "MODE" -> {
+                        if (entry.modeEnabled && s.driveMode.isNotBlank()) {
+                            addPart("⚙️ ${s.driveMode}", entry.modeSizeSp, "#FFFFAA")
+                        }
+                    }
+                    "NAV" -> {
+                        if (s.navDist > 0) {
+                            addPart("📍 ${s.navDist.toInt()} км", OverlayLine.SIZE_M, "#FFFFFF")
+                        }
+                    }
+                }
             }
 
             if (added) container.addView(row)

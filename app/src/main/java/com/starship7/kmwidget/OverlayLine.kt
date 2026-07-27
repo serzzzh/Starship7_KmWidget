@@ -23,21 +23,26 @@ data class OverlayLine(
 
 /**
  * Одна запись настроек (кнопка «+»).
- * Содержит текст, сумму, батарею, топливо — каждое со своим стилем и размером.
+ * Содержит текст, сумму, батарею, топливо, режим — каждое со своим стилем и размером.
  */
 data class OverlayEntry(
+    val renderOrder: List<String>          = emptyList(),
+
     val textEnabled: Boolean               = false,
     val textValue: String                  = "",
-    val textSizeSp: Int                    = OverlayLine.SIZE_M,
+    val textSizeSp: Int                    = OverlayLine.SIZE_L,
 
     val sumEnabled: Boolean                = false,
-    val sumSizeSp: Int                     = OverlayLine.SIZE_M,
+    val sumSizeSp: Int                     = OverlayLine.SIZE_L,
 
     val batteryEnabled: Boolean            = false,
-    val batteryDisplay: OverlayLineDisplay = OverlayLineDisplay.PERCENT,
-    val batterySizeSp: Int                 = OverlayLine.SIZE_M,
+    val batteryDisplay: OverlayLineDisplay = OverlayLineDisplay.KM,
+    val batterySizeSp: Int                 = OverlayLine.SIZE_L,
 
     val fuelEnabled: Boolean               = false,
     val fuelDisplay: OverlayLineDisplay    = OverlayLineDisplay.KM,
-    val fuelSizeSp: Int                    = OverlayLine.SIZE_M
+    val fuelSizeSp: Int                    = OverlayLine.SIZE_L,
+    
+    val modeEnabled: Boolean               = false,
+    val modeSizeSp: Int                    = OverlayLine.SIZE_L
 )

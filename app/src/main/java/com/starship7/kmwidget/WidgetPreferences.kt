@@ -60,24 +60,54 @@ object OverlaySettings {
     // ── Дополнительные записи ────────────────────────────────────────────
     fun loadEntries(ctx: Context): List<OverlayEntry> {
         val p = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val count = p.getInt("entry_count", 0)
+        val count = p.getInt("entry_count", -1)
+        if (count == -1) {
+            // Default setup for the first launch
+            return listOf(
+                OverlayEntry(
+                    renderOrder = listOf("SUM", "TEXT"),
+                    sumEnabled = true,
+                    sumSizeSp = OverlayLine.SIZE_L,
+                    textEnabled = true,
+                    textValue = "км",
+                    textSizeSp = OverlayLine.SIZE_L
+                ),
+                OverlayEntry(
+                    renderOrder = listOf("BATTERY", "FUEL"),
+                    batteryEnabled = true,
+                    batteryDisplay = OverlayLineDisplay.KM,
+                    batterySizeSp = OverlayLine.SIZE_L,
+                    fuelEnabled = true,
+                    fuelDisplay = OverlayLineDisplay.KM,
+                    fuelSizeSp = OverlayLine.SIZE_L
+                )
+            )
+        }
+        
         return (0 until count).mapNotNull { i ->
             try {
+                val orderString = p.getString("e${i}_order", "") ?: ""
+                val renderOrder = if (orderString.isNotEmpty()) orderString.split(",") else emptyList()
+                
                 OverlayEntry(
+                    renderOrder    = renderOrder,
                     textEnabled    = p.getBoolean("e${i}_text_en",   false),
                     textValue      = p.getString ("e${i}_text_val",  "") ?: "",
-                    textSizeSp     = p.getInt    ("e${i}_text_sz",   OverlayLine.SIZE_M),
+                    textSizeSp     = p.getInt    ("e${i}_text_sz",   OverlayLine.SIZE_L),
 
                     sumEnabled     = p.getBoolean("e${i}_sum_en",    false),
-                    sumSizeSp      = p.getInt    ("e${i}_sum_sz",    OverlayLine.SIZE_M),
+                    sumSizeSp      = p.getInt    ("e${i}_sum_sz",    OverlayLine.SIZE_L),
 
                     batteryEnabled = p.getBoolean("e${i}_bat_en",    false),
-                    batteryDisplay = OverlayLineDisplay.valueOf(p.getString("e${i}_bat_disp", "PERCENT")!!),
-                    batterySizeSp  = p.getInt    ("e${i}_bat_sz",    OverlayLine.SIZE_M),
+                    batteryDisplay = OverlayLineDisplay.valueOf(p.getString("e${i}_bat_disp", "KM")!!),
+                    batterySizeSp  = p.getInt    ("e${i}_bat_sz",    OverlayLine.SIZE_L),
 
                     fuelEnabled    = p.getBoolean("e${i}_fuel_en",   false),
                     fuelDisplay    = OverlayLineDisplay.valueOf(p.getString("e${i}_fuel_disp", "KM")!!),
-                    fuelSizeSp     = p.getInt    ("e${i}_fuel_sz",   OverlayLine.SIZE_M)
+                    fuelSizeSp     = p.getInt    ("e${i}_fuel_sz",   OverlayLine.SIZE_L),
+
+                    modeEnabled    = p.getBoolean("e${i}_mode_en",   false),
+                    modeSizeSp     = p.getInt    ("e${i}_mode_sz",   OverlayLine.SIZE_L)
                 )
             } catch (_: Exception) { null }
         }
@@ -87,6 +117,7 @@ object OverlaySettings {
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().apply {
             putInt("entry_count", entries.size)
             entries.forEachIndexed { i, e ->
+                putString ("e${i}_order",      e.renderOrder.joinToString(","))
                 putBoolean("e${i}_text_en",    e.textEnabled)
                 putString ("e${i}_text_val",   e.textValue)
                 putInt    ("e${i}_text_sz",    e.textSizeSp)
@@ -101,6 +132,9 @@ object OverlaySettings {
                 putBoolean("e${i}_fuel_en",    e.fuelEnabled)
                 putString ("e${i}_fuel_disp",  e.fuelDisplay.name)
                 putInt    ("e${i}_fuel_sz",    e.fuelSizeSp)
+                
+                putBoolean("e${i}_mode_en",    e.modeEnabled)
+                putInt    ("e${i}_mode_sz",    e.modeSizeSp)
             }
             apply()
         }
