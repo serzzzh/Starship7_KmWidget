@@ -49,13 +49,15 @@ class RangeUpdateService : Service() {
         }
 
         val odometer = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.ODOMETER, 0)
+        val evOdo = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.MILEAGE_SINCE_LAST_EV, 0)
+        val fuelOdo = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.MILEAGE_SINCE_LAST_OIL, 0)
         val battery = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_PERCENTAGE, 0)
         val fuel = vehicleHelper.getIntProperty(PropertyConstants.VehicleInfo.FUEL_PERCENTAGE, 0).toFloat()
 
-        Log.i(TAG, "Collected: ODO=$odometer, BAT=$battery, FUEL=$fuel")
+        Log.i(TAG, "Collected: ODO=$odometer EV_ODO=$evOdo FUEL_ODO=$fuelOdo BAT=$battery FUEL=$fuel")
 
         if (odometer > 0) {
-            dbHelper.insertLog(System.currentTimeMillis(), odometer, battery, fuel)
+            dbHelper.insertLog(System.currentTimeMillis(), odometer, evOdo, fuelOdo, battery, fuel)
         }
         // Update widgets regardless — show current battery/fuel even if no history yet
         updateWidgetsOnMainThread()
