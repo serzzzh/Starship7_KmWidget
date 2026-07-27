@@ -16,15 +16,59 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginBottom="4dp">
-        
-        <CheckBox android:id="@+id/cbText" layout_width="wrap_content" layout_height="wrap_content" text="Текст" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
-        <CheckBox android:id="@+id/cbSum" layout_width="wrap_content" layout_height="wrap_content" text="Сумма" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
-        <CheckBox android:id="@+id/cbBattery" layout_width="wrap_content" layout_height="wrap_content" text="АКБ" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
-        <CheckBox android:id="@+id/cbFuel" layout_width="wrap_content" layout_height="wrap_content" text="Бензин" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
-        <CheckBox android:id="@+id/cbMode" layout_width="wrap_content" layout_height="wrap_content" text="Режим" textColor="#EEEEEE" textSize="16sp" minWidth="0dp" layout_marginEnd="12dp" />
+
+        <CheckBox
+            android:id="@+id/cbText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Текст"
+            android:textColor="#EEEEEE"
+            android:textSize="16sp"
+            android:minWidth="0dp"
+            android:layout_marginEnd="12dp" />
+        <CheckBox
+            android:id="@+id/cbSum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Сумма"
+            android:textColor="#EEEEEE"
+            android:textSize="16sp"
+            android:minWidth="0dp"
+            android:layout_marginEnd="12dp" />
+        <CheckBox
+            android:id="@+id/cbBattery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="АКБ"
+            android:textColor="#EEEEEE"
+            android:textSize="16sp"
+            android:minWidth="0dp"
+            android:layout_marginEnd="12dp" />
+        <CheckBox
+            android:id="@+id/cbFuel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Бензин"
+            android:textColor="#EEEEEE"
+            android:textSize="16sp"
+            android:minWidth="0dp"
+            android:layout_marginEnd="12dp" />
+        <CheckBox
+            android:id="@+id/cbMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Режим"
+            android:textColor="#EEEEEE"
+            android:textSize="16sp"
+            android:minWidth="0dp"
+            android:layout_marginEnd="12dp" />
     </LinearLayout>
 
-    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" android:layout_marginVertical="2dp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#333333"
+        android:layout_marginVertical="2dp" />
 
     <!-- Container for Options to reorder them vertically based on selection order -->
     <LinearLayout
@@ -42,7 +86,12 @@
             android:gravity="center_vertical"
             android:visibility="gone"
             android:minHeight="40dp">
-            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Текст:" android:textColor="#AAA" android:textSize="14sp"/>
+            <TextView
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="Текст:"
+                android:textColor="#AAA"
+                android:textSize="14sp" />
             <EditText
                 android:id="@+id/etTextValue"
                 android:layout_width="0dp"
@@ -54,8 +103,15 @@
                 android:textSize="16sp"
                 android:backgroundTint="#555"
                 android:padding="4dp" />
-            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
-            <Spinner android:id="@+id/spinTextSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="#555"
+                android:layout_marginHorizontal="6dp" />
+            <Spinner
+                android:id="@+id/spinTextSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <!-- ─── Опции Суммы ─────────────────────────────────────────────────── -->
@@ -67,10 +123,25 @@
             android:gravity="center_vertical"
             android:visibility="gone"
             android:minHeight="40dp">
-            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Сумма:" android:textColor="#AAA" android:textSize="14sp"/>
-            <Space android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
-            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
-            <Spinner android:id="@+id/spinSumSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="Сумма:"
+                android:textColor="#AAA"
+                android:textSize="14sp" />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="#555"
+                android:layout_marginHorizontal="6dp" />
+            <Spinner
+                android:id="@+id/spinSumSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <!-- ─── Опции АКБ ──────────────────────────────────────────────────── -->
@@ -82,14 +153,45 @@
             android:gravity="center_vertical"
             android:visibility="gone"
             android:minHeight="40dp">
-            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="АКБ:" android:textColor="#AAA" android:textSize="14sp"/>
-            <!-- Единицы батареи: км | % -->
-            <RadioGroup android:id="@+id/rgBatDisplay" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal">
-                <RadioButton android:id="@+id/rbBatKm" layout_width="wrap_content" layout_height="wrap_content" text="км" textColor="#CCC" textSize="14sp" minWidth="0dp"/>
-                <RadioButton android:id="@+id/rbBatPercent" layout_width="wrap_content" layout_height="wrap_content" text="%" textColor="#CCC" textSize="14sp" minWidth="0dp" layout_marginStart="6dp"/>
+            <TextView
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="АКБ:"
+                android:textColor="#AAA"
+                android:textSize="14sp" />
+            <RadioGroup
+                android:id="@+id/rgBatDisplay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:id="@+id/rbBatKm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="км"
+                    android:textColor="#CCC"
+                    android:textSize="14sp"
+                    android:minWidth="0dp" />
+                <RadioButton
+                    android:id="@+id/rbBatPercent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="%"
+                    android:textColor="#CCC"
+                    android:textSize="14sp"
+                    android:minWidth="0dp"
+                    android:layout_marginStart="6dp" />
             </RadioGroup>
-            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
-            <Spinner android:id="@+id/spinBatSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="#555"
+                android:layout_marginHorizontal="6dp" />
+            <Spinner
+                android:id="@+id/spinBatSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <!-- ─── Опции Бензина ──────────────────────────────────────────────── -->
@@ -101,14 +203,54 @@
             android:gravity="center_vertical"
             android:visibility="gone"
             android:minHeight="40dp">
-            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Бензин:" android:textColor="#AAA" android:textSize="14sp"/>
-            <RadioGroup android:id="@+id/rgFuelDisplay" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="horizontal">
-                <RadioButton android:id="@+id/rbFuelKm" layout_width="wrap_content" layout_height="wrap_content" text="км" textColor="#CCC" textSize="14sp" minWidth="0dp"/>
-                <RadioButton android:id="@+id/rbFuelLiters" layout_width="wrap_content" layout_height="wrap_content" text="л" textColor="#CCC" textSize="14sp" minWidth="0dp" layout_marginStart="6dp"/>
-                <RadioButton android:id="@+id/rbFuelPercent" layout_width="wrap_content" layout_height="wrap_content" text="%" textColor="#CCC" textSize="14sp" minWidth="0dp" layout_marginStart="6dp"/>
+            <TextView
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="Бензин:"
+                android:textColor="#AAA"
+                android:textSize="14sp" />
+            <RadioGroup
+                android:id="@+id/rgFuelDisplay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:id="@+id/rbFuelKm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="км"
+                    android:textColor="#CCC"
+                    android:textSize="14sp"
+                    android:minWidth="0dp" />
+                <RadioButton
+                    android:id="@+id/rbFuelLiters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="л"
+                    android:textColor="#CCC"
+                    android:textSize="14sp"
+                    android:minWidth="0dp"
+                    android:layout_marginStart="6dp" />
+                <RadioButton
+                    android:id="@+id/rbFuelPercent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="%"
+                    android:textColor="#CCC"
+                    android:textSize="14sp"
+                    android:minWidth="0dp"
+                    android:layout_marginStart="6dp" />
             </RadioGroup>
-            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
-            <Spinner android:id="@+id/spinFuelSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="#555"
+                android:layout_marginHorizontal="6dp" />
+            <Spinner
+                android:id="@+id/spinFuelSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <!-- ─── Опции Режима ────────────────────────────────────────────────── -->
@@ -120,14 +262,33 @@
             android:gravity="center_vertical"
             android:visibility="gone"
             android:minHeight="40dp">
-            <TextView android:layout_width="60dp" android:layout_height="wrap_content" android:text="Режим:" android:textColor="#AAA" android:textSize="14sp"/>
-            <Space android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
-            <View android:layout_width="1dp" android:layout_height="16dp" android:background="#555" android:layout_marginHorizontal="6dp" />
-            <Spinner android:id="@+id/spinModeSize" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="Режим:"
+                android:textColor="#AAA"
+                android:textSize="14sp" />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="#555"
+                android:layout_marginHorizontal="6dp" />
+            <Spinner
+                android:id="@+id/spinModeSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 
-    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" android:layout_marginVertical="2dp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#333333"
+        android:layout_marginVertical="2dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
