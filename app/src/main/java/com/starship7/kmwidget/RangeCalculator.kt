@@ -73,6 +73,15 @@ object RangeCalculator {
         val fuelStr = if (currentFuel >= 0) "${currentFuel.toInt()}%" else "?"
 
         val navDist = vehicleHelper.getIntProperty(557872641, 0).toFloat() // FUNC_NAVI_VEHICLE_DESTINATION_DISTANCE
+        val batTemp = vehicleHelper.getFloatProperty(PropertyConstants.VehicleInfo.EV_BATTERY_TEMP, 20f)
+        
+        // Температурный коэффициент: от 1.0 при +20°C до 0.6 при -20°C (падение 1% запаса на каждый градус холода)
+        val tempCoeff = if (batTemp >= 20f) {
+            1.0f
+        } else {
+            val drop = (20f - batTemp) * 0.01f
+            (1.0f - drop).coerceIn(0.5f, 1.0f)
+        }
         
         val modeInt = vehicleHelper.getIntProperty(557871372, 0) // DM_FUNC_DRIVE_MODE_SELECT
         val modeStr = when (modeInt) {
@@ -116,15 +125,19 @@ object RangeCalculator {
         val longValidFuel = longTermEff.isValidFuel(1.0f)
 
         // Подсчет эффективности EV (км на 1% батареи)
+        val longTermAdjEff = longTermEff.evKmPerPct * tempCoeff
+        val fallbackEvEff = (if (currentBat > 0) carEv / currentBat else 0f) * tempCoeff
+
         if (shortValidEv && longValidEv) {
-            // Смешиваем: 70% на текущий режим (скорость 130 или город) и 30% на старые данные
-            finalEvEff = shortTermEff.evKmPerPct * 0.7f + longTermEff.evKmPerPct * 0.3f
+            // Смешиваем: 70% на текущий режим (который УЖЕ учитывает текущую температуру) 
+            // и 30% на старые данные (скорректированные на текущую температуру)
+            finalEvEff = shortTermEff.evKmPerPct * 0.7f + longTermAdjEff * 0.3f
         } else if (shortValidEv) {
             finalEvEff = shortTermEff.evKmPerPct
         } else if (longValidEv) {
-            finalEvEff = longTermEff.evKmPerPct
+            finalEvEff = longTermAdjEff
         } else if (currentBat > 0 && carEv > 0) {
-            finalEvEff = carEv / currentBat // нативный запас (fallback)
+            finalEvEff = fallbackEvEff // нативный запас (fallback), пессимизированный холодом
         }
 
         // Подсчет эффективности Fuel (км на 1% бака)
