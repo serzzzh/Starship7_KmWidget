@@ -144,12 +144,12 @@ class RangeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "RangeDa
         val dFuelOdo = endFuelOdo - startFuelOdo
         val dFuel = startFuel - endFuel
 
-        if (dEvOdo > 0 && dEvOdo < 1000 && dBat > 0) {
+        if (dEvOdo >= 0 && dEvOdo < 1000 && dBat > 0) {
             eff.evKm += dEvOdo
             eff.evBatDrop += dBat
         }
         
-        if (dFuelOdo > 0 && dFuelOdo < 1000 && dFuel > 0) {
+        if (dFuelOdo >= 0 && dFuelOdo < 1000 && dFuel > 0) {
             eff.fuelKm += dFuelOdo
             eff.fuelDrop += dFuel
         }

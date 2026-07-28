@@ -1,0 +1,286 @@
+﻿2026-07-27T19:26:09.9851047Z Current runner version: '2.336.0'
+2026-07-27T19:26:09.9877349Z ##[group]Runner Image Provisioner
+2026-07-27T19:26:09.9878172Z Hosted Compute Agent
+2026-07-27T19:26:09.9878776Z Version: 20260707.563
+2026-07-27T19:26:09.9879532Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+2026-07-27T19:26:09.9880248Z Build Date: 2026-07-07T19:33:50Z
+2026-07-27T19:26:09.9880952Z Worker ID: {77c91e02-2c5d-4c50-9ae1-b4e25bee5c53}
+2026-07-27T19:26:09.9881724Z Azure Region: eastus
+2026-07-27T19:26:09.9882285Z ##[endgroup]
+2026-07-27T19:26:09.9883807Z ##[group]Operating System
+2026-07-27T19:26:09.9884831Z Ubuntu
+2026-07-27T19:26:09.9885334Z 24.04.4
+2026-07-27T19:26:09.9885943Z LTS
+2026-07-27T19:26:09.9886441Z ##[endgroup]
+2026-07-27T19:26:09.9887049Z ##[group]Runner Image
+2026-07-27T19:26:09.9887660Z Image: ubuntu-24.04
+2026-07-27T19:26:09.9888219Z Version: 20260720.247.2
+2026-07-27T19:26:09.9889520Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260720.247/images/ubuntu/Ubuntu2404-Readme.md
+2026-07-27T19:26:09.9891168Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260720.247
+2026-07-27T19:26:09.9892154Z ##[endgroup]
+2026-07-27T19:26:09.9893268Z ##[group]GITHUB_TOKEN Permissions
+2026-07-27T19:26:09.9895782Z Contents: read
+2026-07-27T19:26:09.9896415Z Metadata: read
+2026-07-27T19:26:09.9897386Z Packages: read
+2026-07-27T19:26:09.9897946Z ##[endgroup]
+2026-07-27T19:26:09.9900007Z Secret source: Actions
+2026-07-27T19:26:09.9901366Z Prepare workflow directory
+2026-07-27T19:26:10.0239578Z Prepare all required actions
+2026-07-27T19:26:10.0287635Z Getting action download info
+2026-07-27T19:26:10.2709877Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-07-27T19:26:10.5353459Z Download action repository 'actions/setup-java@v4' (SHA:c1e323688fd81a25caa38c78aa6df2d33d3e20d9)
+2026-07-27T19:26:10.7600244Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-07-27T19:26:11.0251661Z Complete job name: build
+2026-07-27T19:26:11.1254502Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-27T19:26:11.1265446Z ##[group]Run actions/checkout@v4
+2026-07-27T19:26:11.1266407Z with:
+2026-07-27T19:26:11.1266972Z   repository: serzzzh/Starship7_KmWidget
+2026-07-27T19:26:11.1275983Z   token: ***
+2026-07-27T19:26:11.1276529Z   ssh-strict: true
+2026-07-27T19:26:11.1277072Z   ssh-user: git
+2026-07-27T19:26:11.1277633Z   persist-credentials: true
+2026-07-27T19:26:11.1278280Z   clean: true
+2026-07-27T19:26:11.1278845Z   sparse-checkout-cone-mode: true
+2026-07-27T19:26:11.1279562Z   fetch-depth: 1
+2026-07-27T19:26:11.1280115Z   fetch-tags: false
+2026-07-27T19:26:11.1280688Z   show-progress: true
+2026-07-27T19:26:11.1281260Z   lfs: false
+2026-07-27T19:26:11.1281826Z   submodules: false
+2026-07-27T19:26:11.1282399Z   set-safe-directory: true
+2026-07-27T19:26:11.1283077Z   allow-unsafe-pr-checkout: false
+2026-07-27T19:26:11.1284273Z ##[endgroup]
+2026-07-27T19:26:11.2356928Z Syncing repository: serzzzh/Starship7_KmWidget
+2026-07-27T19:26:11.2359679Z ##[group]Getting Git version info
+2026-07-27T19:26:11.2361118Z Working directory is '/home/runner/work/Starship7_KmWidget/Starship7_KmWidget'
+2026-07-27T19:26:11.2363139Z [command]/usr/bin/git version
+2026-07-27T19:26:11.2393771Z git version 2.54.0
+2026-07-27T19:26:11.2418886Z ##[endgroup]
+2026-07-27T19:26:11.2436569Z Temporarily overriding HOME='/home/runner/work/_temp/7a3a2a8a-b24b-4dcb-ae21-754e97a338bd' before making global git config changes
+2026-07-27T19:26:11.2439330Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-27T19:26:11.2442415Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Starship7_KmWidget/Starship7_KmWidget
+2026-07-27T19:26:11.2496873Z Deleting the contents of '/home/runner/work/Starship7_KmWidget/Starship7_KmWidget'
+2026-07-27T19:26:11.2502158Z ##[group]Initializing the repository
+2026-07-27T19:26:11.2509738Z [command]/usr/bin/git init /home/runner/work/Starship7_KmWidget/Starship7_KmWidget
+2026-07-27T19:26:11.2625554Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-07-27T19:26:11.2628129Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-07-27T19:26:11.2630863Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-07-27T19:26:11.2634317Z hint: call:
+2026-07-27T19:26:11.2635682Z hint:
+2026-07-27T19:26:11.2637338Z hint: 	git config --global init.defaultBranch <name>
+2026-07-27T19:26:11.2639659Z hint:
+2026-07-27T19:26:11.2641233Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-07-27T19:26:11.2644422Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-07-27T19:26:11.2646992Z hint:
+2026-07-27T19:26:11.2648025Z hint: 	git branch -m <name>
+2026-07-27T19:26:11.2649281Z hint:
+2026-07-27T19:26:11.2651070Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-07-27T19:26:11.2653711Z Initialized empty Git repository in /home/runner/work/Starship7_KmWidget/Starship7_KmWidget/.git/
+2026-07-27T19:26:11.2660433Z [command]/usr/bin/git remote add origin https://github.com/serzzzh/Starship7_KmWidget
+2026-07-27T19:26:11.2699501Z ##[endgroup]
+2026-07-27T19:26:11.2702182Z ##[group]Disabling automatic garbage collection
+2026-07-27T19:26:11.2704646Z [command]/usr/bin/git config --local gc.auto 0
+2026-07-27T19:26:11.2737300Z ##[endgroup]
+2026-07-27T19:26:11.2739389Z ##[group]Setting up auth
+2026-07-27T19:26:11.2745446Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-27T19:26:11.2784699Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-27T19:26:11.3150348Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-27T19:26:11.3194528Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-27T19:26:11.3455274Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-27T19:26:11.3495577Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-27T19:26:11.3733056Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-07-27T19:26:11.3773758Z ##[endgroup]
+2026-07-27T19:26:11.3776611Z ##[group]Fetching the repository
+2026-07-27T19:26:11.3787280Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c533d333cb2f0576ef984e66079cbd9c61b203d6:refs/remotes/origin/main
+2026-07-27T19:26:12.7522699Z From https://github.com/serzzzh/Starship7_KmWidget
+2026-07-27T19:26:12.7526399Z  * [new ref]         c533d333cb2f0576ef984e66079cbd9c61b203d6 -> origin/main
+2026-07-27T19:26:12.7562370Z ##[endgroup]
+2026-07-27T19:26:12.7564985Z ##[group]Determining the checkout info
+2026-07-27T19:26:12.7567531Z ##[endgroup]
+2026-07-27T19:26:12.7573068Z [command]/usr/bin/git sparse-checkout disable
+2026-07-27T19:26:12.7623936Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-07-27T19:26:12.7661558Z ##[group]Checking out the ref
+2026-07-27T19:26:12.7664416Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-07-27T19:26:12.9247066Z Switched to a new branch 'main'
+2026-07-27T19:26:12.9248539Z branch 'main' set up to track 'origin/main'.
+2026-07-27T19:26:12.9264572Z ##[endgroup]
+2026-07-27T19:26:12.9315803Z [command]/usr/bin/git log -1 --format=%H
+2026-07-27T19:26:12.9342965Z c533d333cb2f0576ef984e66079cbd9c61b203d6
+2026-07-27T19:26:12.9725822Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-27T19:26:12.9727739Z ##[group]Run actions/setup-java@v4
+2026-07-27T19:26:12.9728044Z with:
+2026-07-27T19:26:12.9728277Z   java-version: 17
+2026-07-27T19:26:12.9728530Z   distribution: temurin
+2026-07-27T19:26:12.9728807Z   cache: gradle
+2026-07-27T19:26:12.9729070Z   java-package: jdk
+2026-07-27T19:26:12.9729338Z   check-latest: false
+2026-07-27T19:26:12.9729597Z   server-id: github
+2026-07-27T19:26:12.9729865Z   server-username: GITHUB_ACTOR
+2026-07-27T19:26:12.9730192Z   server-password: GITHUB_TOKEN
+2026-07-27T19:26:12.9730499Z   overwrite-settings: true
+2026-07-27T19:26:12.9730802Z   job-status: success
+2026-07-27T19:26:12.9733725Z   token: ***
+2026-07-27T19:26:12.9734291Z ##[endgroup]
+2026-07-27T19:26:13.1388893Z ##[group]Installed distributions
+2026-07-27T19:26:13.1545699Z Resolved Java 17.0.19+10 from tool-cache
+2026-07-27T19:26:13.1546607Z Setting Java 17.0.19+10 as the default
+2026-07-27T19:26:13.1558124Z (node:2251) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-07-27T19:26:13.1559729Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-07-27T19:26:13.1562773Z Creating toolchains.xml for JDK version 17 from temurin
+2026-07-27T19:26:13.1642248Z Writing to /home/runner/.m2/toolchains.xml
+2026-07-27T19:26:13.1643576Z 
+2026-07-27T19:26:13.1643935Z Java configuration:
+2026-07-27T19:26:13.1644794Z   Distribution: temurin
+2026-07-27T19:26:13.1645371Z   Version: 17.0.19+10
+2026-07-27T19:26:13.1646127Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-07-27T19:26:13.1646801Z 
+2026-07-27T19:26:13.1647409Z ##[endgroup]
+2026-07-27T19:26:13.1663651Z Creating settings.xml with server-id: github
+2026-07-27T19:26:13.1680904Z Writing to /home/runner/.m2/settings.xml
+2026-07-27T19:26:13.3127685Z Cache hit for: setup-java-Linux-x64-gradle-9ea9e041b2ac9b828eaf28eed62f0431148bb3c3b41161692ff26ca0eb0ef2a6
+2026-07-27T19:26:13.3235525Z (node:2251) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-07-27T19:26:14.3675897Z Received 188743680 of 482076887 (39.2%), 180.0 MBs/sec
+2026-07-27T19:26:15.3689146Z Received 448790528 of 482076887 (93.1%), 213.8 MBs/sec
+2026-07-27T19:26:15.4721851Z Received 482076887 of 482076887 (100.0%), 218.4 MBs/sec
+2026-07-27T19:26:15.4723316Z Cache Size: ~460 MB (482076887 B)
+2026-07-27T19:26:15.4851655Z [command]/usr/bin/tar -xf /home/runner/work/_temp/8ae780b5-bf82-4774-adfc-4d2231b0949c/cache.tzst -P -C /home/runner/work/Starship7_KmWidget/Starship7_KmWidget --use-compress-program unzstd
+2026-07-27T19:26:17.5996967Z Cache restored successfully
+2026-07-27T19:26:17.6216531Z Cache restored from key: setup-java-Linux-x64-gradle-9ea9e041b2ac9b828eaf28eed62f0431148bb3c3b41161692ff26ca0eb0ef2a6
+2026-07-27T19:26:17.6428800Z ##[group]Run chmod +x gradlew setup-keys.sh
+2026-07-27T19:26:17.6429233Z [36;1mchmod +x gradlew setup-keys.sh[0m
+2026-07-27T19:26:17.6481066Z shell: /usr/bin/bash -e {0}
+2026-07-27T19:26:17.6481362Z env:
+2026-07-27T19:26:17.6481741Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-07-27T19:26:17.6482361Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-07-27T19:26:17.6482833Z ##[endgroup]
+2026-07-27T19:26:17.6614823Z ##[group]Run ./setup-keys.sh
+2026-07-27T19:26:17.6615148Z [36;1m./setup-keys.sh[0m
+2026-07-27T19:26:17.6657620Z shell: /usr/bin/bash -e {0}
+2026-07-27T19:26:17.6658110Z env:
+2026-07-27T19:26:17.6658509Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-07-27T19:26:17.6659184Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-07-27T19:26:17.6659706Z ##[endgroup]
+2026-07-27T19:26:17.6739053Z === GGSCC: Загрузка AOSP тестовых ключей ===
+2026-07-27T19:26:17.6754446Z ⬇ Скачиваю platform.pk8...
+2026-07-27T19:26:17.7411509Z ✓ platform.pk8 загружен
+2026-07-27T19:26:17.7412096Z ⬇ Скачиваю platform.x509.pem...
+2026-07-27T19:26:17.7993698Z ✓ platform.x509.pem загружен
+2026-07-27T19:26:17.7994899Z ⚙ Создаю platform.p12 из pk8 + pem...
+2026-07-27T19:26:17.8111242Z ✓ platform.p12 создан
+2026-07-27T19:26:17.8111519Z 
+2026-07-27T19:26:17.8111786Z === Ключи готовы! Можно собирать проект: ===
+2026-07-27T19:26:17.8112443Z   ./gradlew assemblePrivilegedRelease
+2026-07-27T19:26:17.8144256Z ##[group]Run ./gradlew assemblePrivilegedRelease
+2026-07-27T19:26:17.8144859Z [36;1m./gradlew assemblePrivilegedRelease[0m
+2026-07-27T19:26:17.8192484Z shell: /usr/bin/bash -e {0}
+2026-07-27T19:26:17.8192803Z env:
+2026-07-27T19:26:17.8193207Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-07-27T19:26:17.8193880Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+2026-07-27T19:26:17.8194924Z ##[endgroup]
+2026-07-27T19:26:20.1985347Z 
+2026-07-27T19:26:20.1999462Z Welcome to Gradle 8.13!
+2026-07-27T19:26:20.1999907Z 
+2026-07-27T19:26:20.2000209Z Here are the highlights of this release:
+2026-07-27T19:26:20.2000884Z  - Daemon JVM auto-provisioning
+2026-07-27T19:26:20.2001410Z  - Enhancements for Scala plugin and JUnit testing
+2026-07-27T19:26:20.2002015Z  - Improvements for build authors and plugin developers
+2026-07-27T19:26:20.2002416Z 
+2026-07-27T19:26:20.2002812Z For more details see https://docs.gradle.org/8.13/release-notes.html
+2026-07-27T19:26:20.2003312Z 
+2026-07-27T19:26:20.3915511Z Starting a Gradle Daemon (subsequent builds will be faster)
+2026-07-27T19:26:35.7945725Z Checking the license for package Android SDK Platform 33 in /usr/local/lib/android/sdk/licenses
+2026-07-27T19:26:35.7965555Z License for package Android SDK Platform 33 accepted.
+2026-07-27T19:26:35.7995011Z Preparing "Install Android SDK Platform 33 (revision 3)".
+2026-07-27T19:26:39.1915257Z "Install Android SDK Platform 33 (revision 3)" ready.
+2026-07-27T19:26:39.1921038Z Installing Android SDK Platform 33 in /usr/local/lib/android/sdk/platforms/android-33
+2026-07-27T19:26:39.1922356Z "Install Android SDK Platform 33 (revision 3)" complete.
+2026-07-27T19:26:39.4917650Z "Install Android SDK Platform 33 (revision 3)" finished.
+2026-07-27T19:26:39.9926159Z [=========                              ] 25%                                   
+2026-07-27T19:26:39.9945097Z > Task :app:preBuild UP-TO-DATE
+2026-07-27T19:26:39.9965267Z > Task :app:prePrivilegedReleaseBuild UP-TO-DATE
+2026-07-27T19:26:39.9995291Z > Task :app:mergePrivilegedReleaseNativeDebugMetadata NO-SOURCE
+2026-07-27T19:26:40.4915008Z > Task :app:dataBindingMergeDependencyArtifactsPrivilegedRelease
+2026-07-27T19:26:40.4917642Z > Task :app:generatePrivilegedReleaseResValues
+2026-07-27T19:26:40.5917797Z > Task :app:generatePrivilegedReleaseResources
+2026-07-27T19:26:43.1929295Z > Task :app:packagePrivilegedReleaseResources
+2026-07-27T19:26:43.1945207Z > Task :app:processPrivilegedReleaseNavigationResources
+2026-07-27T19:26:43.3936595Z > Task :app:parsePrivilegedReleaseLocalResources
+2026-07-27T19:26:43.3962104Z > Task :app:compilePrivilegedReleaseNavigationResources
+2026-07-27T19:26:43.3995080Z > Task :app:checkPrivilegedReleaseAarMetadata
+2026-07-27T19:26:43.4933020Z > Task :app:mapPrivilegedReleaseSourceSetPaths
+2026-07-27T19:26:43.4943354Z > Task :app:createPrivilegedReleaseCompatibleScreenManifests
+2026-07-27T19:26:43.4986318Z > Task :app:extractDeepLinksPrivilegedRelease
+2026-07-27T19:26:43.6925319Z > Task :app:mergePrivilegedReleaseResources
+2026-07-27T19:26:43.7919996Z > Task :app:processPrivilegedReleaseMainManifest
+2026-07-27T19:26:43.9935377Z > Task :app:dataBindingGenBaseClassesPrivilegedRelease
+2026-07-27T19:26:44.0925452Z > Task :app:processPrivilegedReleaseManifest
+2026-07-27T19:26:44.1936179Z > Task :app:javaPreCompilePrivilegedRelease
+2026-07-27T19:26:44.1937181Z > Task :app:mergePrivilegedReleaseShaders
+2026-07-27T19:26:44.1937995Z > Task :app:compilePrivilegedReleaseShaders NO-SOURCE
+2026-07-27T19:26:44.1938875Z > Task :app:generatePrivilegedReleaseAssets UP-TO-DATE
+2026-07-27T19:26:44.2914644Z > Task :app:mergePrivilegedReleaseAssets
+2026-07-27T19:26:44.2915788Z > Task :app:compressPrivilegedReleaseAssets
+2026-07-27T19:26:44.3921369Z > Task :app:processPrivilegedReleaseManifestForPackage
+2026-07-27T19:26:44.3922667Z > Task :app:checkPrivilegedReleaseDuplicateClasses
+2026-07-27T19:26:44.5935441Z > Task :app:desugarPrivilegedReleaseFileDependencies
+2026-07-27T19:26:44.7957394Z > Task :app:mergePrivilegedReleaseJniLibFolders
+2026-07-27T19:26:44.8935432Z > Task :app:mergePrivilegedReleaseNativeLibs NO-SOURCE
+2026-07-27T19:26:44.8995032Z > Task :app:mergeLibDexPrivilegedRelease
+2026-07-27T19:26:44.9024979Z > Task :app:stripPrivilegedReleaseDebugSymbols NO-SOURCE
+2026-07-27T19:26:44.9054784Z > Task :app:validateSigningPrivilegedRelease
+2026-07-27T19:26:44.9114774Z > Task :app:writePrivilegedReleaseAppMetadata
+2026-07-27T19:26:44.9923273Z > Task :app:writePrivilegedReleaseSigningConfigVersions
+2026-07-27T19:26:45.4915783Z warn: removing resource com.starship7.kmwidget:string/widget_activity_title without required default value.
+2026-07-27T19:26:45.4944168Z 
+2026-07-27T19:26:45.8938565Z > Task :app:processPrivilegedReleaseResources
+2026-07-27T19:26:51.0914189Z > Task :app:mergeExtDexPrivilegedRelease
+2026-07-27T19:26:57.3927468Z 
+2026-07-27T19:26:57.3928230Z > Task :app:compilePrivilegedReleaseKotlin FAILED
+2026-07-27T19:26:57.3939325Z e: file:///home/runner/work/Starship7_KmWidget/Starship7_KmWidget/app/src/main/java/com/starship7/kmwidget/RangeCalculator.kt:76:101 The floating-point literal does not conform to the expected type Int
+2026-07-27T19:26:57.4917500Z 
+2026-07-27T19:26:57.4938568Z 
+2026-07-27T19:26:57.4939890Z [Incubating] Problems report is available at: file:///home/runner/work/Starship7_KmWidget/Starship7_KmWidget/build/reports/problems/problems-report.html
+2026-07-27T19:26:57.4942846Z FAILURE: Build failed with an exception.
+2026-07-27T19:26:57.4943474Z 
+2026-07-27T19:26:57.4943916Z * What went wrong:
+2026-07-27T19:26:57.4944976Z Execution failed for task ':app:compilePrivilegedReleaseKotlin'.
+2026-07-27T19:26:57.4946588Z > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+2026-07-27T19:26:57.4948066Z    > Compilation error. See log for more details
+2026-07-27T19:26:57.4948601Z 
+2026-07-27T19:26:57.4948900Z * Try:
+2026-07-27T19:26:57.4949534Z > Run with --stacktrace option to get the stack trace.
+2026-07-27T19:26:57.4950401Z > Run with --info or --debug option to get more log output.
+2026-07-27T19:26:57.4951289Z > Run with --scan to get full insights.
+2026-07-27T19:26:57.4951944Z > Get more help at https://help.gradle.org.
+2026-07-27T19:26:57.4952330Z 
+2026-07-27T19:26:57.4952486Z BUILD FAILED in 38s
+2026-07-27T19:26:57.4952884Z 
+2026-07-27T19:26:57.4953387Z Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+2026-07-27T19:26:57.4954274Z 
+2026-07-27T19:26:57.4955024Z You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+2026-07-27T19:26:57.4956011Z 
+2026-07-27T19:26:57.4957958Z For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+2026-07-27T19:26:57.4959184Z 30 actionable tasks: 30 executed
+2026-07-27T19:26:57.9395617Z ##[error]Process completed with exit code 1.
+2026-07-27T19:26:57.9536472Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-27T19:26:57.9537983Z Post job cleanup.
+2026-07-27T19:26:58.0901926Z (node:2533) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-07-27T19:26:58.0903243Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-07-27T19:26:58.1142210Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-27T19:26:58.1146426Z Post job cleanup.
+2026-07-27T19:26:58.2043940Z [command]/usr/bin/git version
+2026-07-27T19:26:58.2088432Z git version 2.54.0
+2026-07-27T19:26:58.2161883Z Temporarily overriding HOME='/home/runner/work/_temp/a15ec47a-fa72-4ee1-abda-9dc9dceb80d2' before making global git config changes
+2026-07-27T19:26:58.2163747Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-27T19:26:58.2168506Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Starship7_KmWidget/Starship7_KmWidget
+2026-07-27T19:26:58.2209449Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-27T19:26:58.2252953Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-27T19:26:58.2514459Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-27T19:26:58.2544666Z http.https://github.com/.extraheader
+2026-07-27T19:26:58.2557543Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-07-27T19:26:58.2596060Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-27T19:26:58.2870254Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-27T19:26:58.2913105Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-27T19:26:58.3312055Z Cleaning up orphan processes
+2026-07-27T19:26:58.3553554Z Terminate orphan process: pid (2320) (java)
+2026-07-27T19:26:58.3577526Z Terminate orphan process: pid (2486) (java)
+2026-07-27T19:26:58.3623175Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

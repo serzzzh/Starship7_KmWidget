@@ -153,8 +153,13 @@ object RangeCalculator {
         }
 
         // Вычисляем финальный запас хода на основе посчитанных эффективностей
-        val calculatedEvRange = if (finalEvEff > 0 && currentBat > 0) finalEvEff * currentBat else carEv
-        val calculatedFuelRange = if (finalFuelEff > 0 && currentFuel > 0) finalFuelEff * currentFuel else carFuel
+        val rawCalculatedEvRange = if (finalEvEff > 0 && currentBat > 0) finalEvEff * currentBat else carEv
+        val rawCalculatedFuelRange = if (finalFuelEff > 0 && currentFuel > 0) finalFuelEff * currentFuel else carFuel
+
+        // Защита от неадекватных завышений: расчетный пробег никогда не должен превышать 
+        // максимальный заявленный/расчетный пробег от самого автомобиля (WLTC/CLTC)
+        val calculatedEvRange = rawCalculatedEvRange.coerceAtMost(carEv)
+        val calculatedFuelRange = rawCalculatedFuelRange.coerceAtMost(carFuel)
 
         val isUsingCalculatedData = finalEvEff > 0 || finalFuelEff > 0
 
