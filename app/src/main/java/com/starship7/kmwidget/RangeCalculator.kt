@@ -142,6 +142,21 @@ object RangeCalculator {
         }
 
         // Подсчет эффективности Fuel (км на 1% бака)
+        val fallbackFuelKmPerLiter = if (batTemp >= 20f) {
+            100f / 6f   // 16.66 км на литр (6 л / 100 км)
+        } else if (batTemp <= -20f) {
+            100f / 8f   // 12.5 км на литр (8 л / 100 км)
+        } else {
+            // Линейная интерполяция между -20°C (8л) и +20°C (6л)
+            // Доля от 0 до 1, где 0 это -20°C, а 1 это +20°C
+            val fraction = (batTemp + 20f) / 40f
+            val interpolatedLiters = 8f - (2f * fraction)
+            100f / interpolatedLiters
+        }
+        
+        // Переводим "км на литр" в "км на 1% бака" (бак 50л -> 1% = 0.5л)
+        val fallbackFuelEff = fallbackFuelKmPerLiter * (OverlayLine.FUEL_TANK_LITERS / 100f)
+
         if (shortValidFuel && longValidFuel) {
             finalFuelEff = shortTermEff.fuelKmPerPct * 0.7f + longTermEff.fuelKmPerPct * 0.3f
         } else if (shortValidFuel) {
@@ -149,17 +164,22 @@ object RangeCalculator {
         } else if (longValidFuel) {
             finalFuelEff = longTermEff.fuelKmPerPct
         } else if (currentFuel > 0 && carFuel > 0) {
-            finalFuelEff = carFuel / currentFuel // нативный запас (fallback)
+            finalFuelEff = fallbackFuelEff // Идеализированный или усредненный расход в зависимости от температуры
         }
 
         // Вычисляем финальный запас хода на основе посчитанных эффективностей
         val rawCalculatedEvRange = if (finalEvEff > 0 && currentBat > 0) finalEvEff * currentBat else carEv
         val rawCalculatedFuelRange = if (finalFuelEff > 0 && currentFuel > 0) finalFuelEff * currentFuel else carFuel
 
-        // Защита от неадекватных завышений: расчетный пробег никогда не должен превышать 
-        // максимальный заявленный/расчетный пробег от самого автомобиля (WLTC/CLTC)
+        // Защита от неадекватных завышений: расчетный пробег EV не должен превышать штатный WLTC.
+        // Для бензина мы используем жесткую интерполяцию как Fallback, поэтому потолок carFuel применять только 
+        // если есть реальная история, которая оказалась выше WLTC. Если используем fallback - берем его.
         val calculatedEvRange = rawCalculatedEvRange.coerceAtMost(carEv)
-        val calculatedFuelRange = rawCalculatedFuelRange.coerceAtMost(carFuel)
+        val calculatedFuelRange = if (shortValidFuel || longValidFuel) {
+            rawCalculatedFuelRange.coerceAtMost(carFuel)
+        } else {
+            rawCalculatedFuelRange
+        }
 
         val isUsingCalculatedData = finalEvEff > 0 || finalFuelEff > 0
 
